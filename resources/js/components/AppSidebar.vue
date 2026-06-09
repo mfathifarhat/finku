@@ -24,7 +24,7 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Pengeluaran',
+        title: 'Transaksi',
         href: '/expenses',
         icon: Wallet,
     },

@@ -56,6 +56,7 @@ interface User {
 
 interface Summary {
     income: number;
+    actual_income: number;
     spent_needs: number;
     spent_wants: number;
     spent_savings: number;
@@ -161,6 +162,13 @@ const getProgressBarColor = (percent: number) => {
                     </span>
                     <h1 class="text-3xl font-extrabold tracking-tight mt-3">Halo, {{ user.name }}!</h1>
                     <p class="text-white/80 mt-1">Siap menaikkan level finansialmu hari ini? Catat keuanganmu & kumpulkan XP!</p>
+                    
+                    <!-- Dynamic Cash Flow Indicator -->
+                    <div class="mt-4 flex items-center gap-2 text-sm bg-white/15 backdrop-blur-md rounded-xl p-3 border border-white/10 w-fit">
+                        <TrendingUp v-if="summary.actual_income >= (summary.spent_needs + summary.spent_wants)" class="w-4 h-4 text-emerald-300" />
+                        <TrendingUp v-else class="w-4 h-4 text-red-300 rotate-180" />
+                        <span>Sisa Uang Anda (Cash Flow): <strong class="text-yellow-300">{{ formatRupiah(summary.actual_income - (summary.spent_needs + summary.spent_wants)) }}</strong></span>
+                    </div>
                 </div>
 
                 <!-- Quick Navigation Action -->
@@ -219,8 +227,9 @@ const getProgressBarColor = (percent: number) => {
             <Card class="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-md">
                 <CardContent class="p-6 flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Pendapatan</p>
-                        <h3 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">{{ formatRupiah(summary.income) }}</h3>
+                        <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Pemasukan Riil</p>
+                        <h3 class="text-2xl font-bold text-slate-800 dark:text-slate-100 mt-1">{{ formatRupiah(summary.actual_income) }}</h3>
+                        <p class="text-[10px] text-slate-400 mt-1">Rencana: {{ formatRupiah(summary.income) }}</p>
                     </div>
                     <div class="p-3 bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 rounded-xl">
                         <Coins class="w-6 h-6" />

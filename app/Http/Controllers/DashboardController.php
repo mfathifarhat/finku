@@ -27,6 +27,13 @@ class DashboardController extends Controller
         $spentNeeds = $expenses->where('type', 'needs')->sum('amount');
         $spentWants = $expenses->where('type', 'wants')->sum('amount');
         
+        // Current month's actual incomes
+        $actualIncomes = $user->incomes()
+            ->whereMonth('date', now()->month)
+            ->whereYear('date', now()->year)
+            ->get();
+        $totalActualIncome = $actualIncomes->sum('amount');
+        
         // Savings contribution: sum of current_amount of active goals
         $spentSavings = $user->goals()->sum('current_amount');
         
@@ -140,6 +147,7 @@ Berikan 1 atau 2 kalimat rekomendasi finansial yang ramah, ringkas, memotivasi, 
             ],
             'summary' => [
                 'income' => $income,
+                'actual_income' => $totalActualIncome,
                 'spent_needs' => $spentNeeds,
                 'spent_wants' => $spentWants,
                 'spent_savings' => $spentSavings,

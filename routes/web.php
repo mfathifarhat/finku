@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\GamificationController;
 use App\Http\Controllers\InsightController;
@@ -19,6 +20,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('expenses/scan', [ExpenseController::class, 'scanReceipt'])->name('expenses.scan');
     Route::put('expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
     Route::delete('expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
+
+    Route::post('incomes', [IncomeController::class, 'store'])->name('incomes.store');
+    Route::post('incomes/scan', [IncomeController::class, 'scanTransferProof'])->name('incomes.scan');
+    Route::put('incomes/{income}', [IncomeController::class, 'update'])->name('incomes.update');
+    Route::delete('incomes/{income}', [IncomeController::class, 'destroy'])->name('incomes.destroy');
 
     Route::get('goals', [GoalController::class, 'index'])->name('goals.index');
     Route::post('goals', [GoalController::class, 'store'])->name('goals.store');

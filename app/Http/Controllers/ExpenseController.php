@@ -14,24 +14,32 @@ class ExpenseController extends Controller
     {
         $user = $request->user();
 
-        $query = $user->expenses()->latest('date');
-
+        // 1. Fetch Expenses
+        $expenseQuery = $user->expenses()->latest('date');
         if ($request->filled('type')) {
-            $query->where('type', $request->type);
+            $expenseQuery->where('type', $request->type);
         }
-
         if ($request->filled('category')) {
-            $query->where('category', $request->category);
+            $expenseQuery->where('category', $request->category);
         }
+        $expenses = $expenseQuery->get();
 
-        $expenses = $query->get();
+        // 2. Fetch Incomes
+        $incomeQuery = $user->incomes()->latest('date');
+        if ($request->filled('income_category')) {
+            $incomeQuery->where('category', $request->income_category);
+        }
+        $incomes = $incomeQuery->get();
 
         $categories = ['Makanan', 'Transportasi', 'Belanja', 'Hiburan', 'Tagihan', 'Kesehatan', 'Pendidikan', 'Lainnya'];
+        $incomeCategories = ['Gaji', 'Sampingan', 'Investasi', 'Hadiah', 'Lainnya'];
 
         return Inertia::render('Expenses/Index', [
             'expenses' => $expenses,
+            'incomes' => $incomes,
             'categories' => $categories,
-            'filters' => $request->only(['type', 'category']),
+            'income_categories' => $incomeCategories,
+            'filters' => $request->only(['type', 'category', 'income_category']),
         ]);
     }
 

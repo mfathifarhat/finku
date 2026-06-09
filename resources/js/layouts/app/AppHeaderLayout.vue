@@ -24,7 +24,7 @@ const { isCurrentUrl } = useCurrentUrl();
 
 const mobileNavItems = [
     { title: 'Home', href: '/dashboard', icon: LayoutGrid },
-    { title: 'Catat', href: '/expenses', icon: Wallet },
+    { title: 'Transaksi', href: '/expenses', icon: Wallet },
     { title: 'Target', href: '/goals', icon: Target },
     { title: 'Lencana', href: '/gamification', icon: Trophy },
     { title: 'Analisis', href: '/insights', icon: TrendingUp },

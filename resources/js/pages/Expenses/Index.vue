@@ -158,14 +158,14 @@ const onIncomeFileSelected = async (event: Event) => {
         });
 
         const result = await response.json();
-        
+
         if (response.ok && result.success) {
             const data = result.data;
             addIncomeForm.amount = data.amount.toString();
             addIncomeForm.category = data.category;
             addIncomeForm.date = data.date;
             addIncomeForm.description = data.description;
-            
+
             scanIncomeSuccessMsg.value = result.message || 'Bukti transfer berhasil dipindai!';
         } else if (result.error === 'ai_inactive') {
             isAiScannerActive.value = false;
@@ -215,7 +215,7 @@ const onFileSelected = async (event: Event) => {
         });
 
         const result = await response.json();
-        
+
         if (response.ok && result.success) {
             const data = result.data;
             addExpenseForm.amount = data.amount.toString();
@@ -223,7 +223,7 @@ const onFileSelected = async (event: Event) => {
             addExpenseForm.type = data.type;
             addExpenseForm.date = data.date;
             addExpenseForm.description = data.description;
-            
+
             scanSuccessMsg.value = result.message || 'Struk berhasil dipindai!';
         } else if (result.error === 'ai_inactive') {
             isAiScannerActive.value = false;
@@ -389,15 +389,15 @@ watch(showAddIncomeDialog, (val) => {
                 </p>
             </div>
 
-            <div class="flex gap-2">
-                <Button 
+            <div class="flex flex-wrap gap-2">
+                <Button
                     variant="outline"
                     class="border-emerald-600/30 text-emerald-700 hover:bg-emerald-50/50 hover:text-emerald-800 font-medium shadow-sm"
                     @click="showAddIncomeDialog = true"
                 >
                     <Coins class="w-4 h-4 mr-2" /> Catat Pemasukan
                 </Button>
-                <Button 
+                <Button
                     class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow"
                     @click="showAddExpenseDialog = true"
                 >
@@ -455,7 +455,7 @@ watch(showAddIncomeDialog, (val) => {
 
         <!-- Filters Section -->
         <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md flex flex-wrap gap-4 items-end">
-            
+
             <!-- Filters for Expenses Tab -->
             <template v-if="currentTab === 'expense'">
                 <!-- Filter Type (Needs/Wants) -->
@@ -540,7 +540,7 @@ watch(showAddIncomeDialog, (val) => {
                                 <th scope="col" class="px-6 py-3 font-semibold text-right">Aksi</th>
                             </tr>
                         </thead>
-                        
+
                         <!-- Incomes Table Header -->
                         <thead v-else class="text-xs text-slate-700 dark:text-slate-300 uppercase bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
                             <tr>
@@ -654,10 +654,10 @@ watch(showAddIncomeDialog, (val) => {
                 </Alert>
 
                 <!-- AI OCR Receipt Scan Area -->
-                <div 
+                <div
                     class="mt-2 p-4 rounded-xl border border-dashed text-center flex flex-col items-center justify-center gap-2 transition-all"
-                    :class="isAiScannerActive 
-                        ? 'border-emerald-300 bg-emerald-50/40 hover:bg-emerald-50/70 dark:bg-emerald-950/10 dark:border-emerald-800 dark:hover:bg-emerald-950/20 cursor-pointer' 
+                    :class="isAiScannerActive
+                        ? 'border-emerald-300 bg-emerald-50/40 hover:bg-emerald-50/70 dark:bg-emerald-950/10 dark:border-emerald-800 dark:hover:bg-emerald-950/20 cursor-pointer'
                         : 'border-slate-350 bg-slate-100 opacity-70 dark:bg-slate-900 dark:border-slate-800'"
                     @click="isAiScannerActive ? triggerFileSelect() : null"
                 >
@@ -786,10 +786,10 @@ watch(showAddIncomeDialog, (val) => {
                 </Alert>
 
                 <!-- AI OCR Bukti Transfer Scan Area -->
-                <div 
+                <div
                     class="mt-2 p-4 rounded-xl border border-dashed text-center flex flex-col items-center justify-center gap-2 transition-all"
-                    :class="isAiScannerActive 
-                        ? 'border-emerald-300 bg-emerald-50/40 hover:bg-emerald-50/70 dark:bg-emerald-950/10 dark:border-emerald-800 dark:hover:bg-emerald-950/20 cursor-pointer' 
+                    :class="isAiScannerActive
+                        ? 'border-emerald-300 bg-emerald-50/40 hover:bg-emerald-50/70 dark:bg-emerald-950/10 dark:border-emerald-800 dark:hover:bg-emerald-950/20 cursor-pointer'
                         : 'border-slate-350 bg-slate-100 opacity-70 dark:bg-slate-900 dark:border-slate-800'"
                     @click="isAiScannerActive ? triggerIncomeFileSelect() : null"
                 >

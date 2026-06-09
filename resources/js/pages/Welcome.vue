@@ -141,52 +141,48 @@ const handleAnchorClick = (e: MouseEvent, href: string) => {
 </script>
 
 <template>
+
     <Head title="Welcome">
         <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Instrument+Serif:ital@0;1&display=swap"
+            rel="stylesheet" />
     </Head>
 
     <div class="landing-page bg-[#FAFAF8] text-navy overflow-x-hidden min-h-screen">
         <!-- NAVBAR -->
-        <nav
-            id="navbar"
-            class="fixed top-0 w-full z-[100] px-[max(2rem,calc((100%-1200px)/2+2rem))] navbar-transition"
-            :class="isScrolled ? 'bg-[#FAFAF8]/90 backdrop-blur-md shadow-[0_1px_0_rgba(4,10,29,0.08)]' : 'bg-transparent'"
-        >
+        <nav id="navbar" class="fixed top-0 w-full z-[100] px-[max(2rem,calc((100%-1200px)/2+2rem))] navbar-transition"
+            :class="isScrolled ? 'bg-[#FAFAF8]/90 backdrop-blur-md shadow-[0_1px_0_rgba(4,10,29,0.08)]' : 'bg-transparent'">
             <div class="flex items-center justify-between h-[72px]">
-                <a href="#beranda" @click="(e) => handleAnchorClick(e, '#beranda')" class="flex items-center gap-2 text-2xl font-extrabold text-navy no-underline">
-                    <AppLogo class="text-2xl font-normal"/>
+                <a href="#beranda" @click="(e) => handleAnchorClick(e, '#beranda')"
+                    class="flex items-center gap-2 text-2xl font-extrabold text-navy no-underline">
+                    <AppLogo class="text-2xl font-normal" />
                 </a>
 
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center gap-8">
                     <ul class="flex list-none gap-8">
                         <li v-for="item in siteConfig.navItems" :key="item.name">
-                            <a :href="item.href" @click="(e) => handleAnchorClick(e, item.href)" class="text-sm font-medium text-[#6B7280] hover:text-navy transition-colors no-underline">
+                            <a :href="item.href" @click="(e) => handleAnchorClick(e, item.href)"
+                                class="text-sm font-medium text-[#6B7280] hover:text-navy transition-colors no-underline">
                                 {{ item.name }}
                             </a>
                         </li>
                     </ul>
                     <div class="flex items-center gap-3">
                         <template v-if="$page.props.auth.user">
-                            <Link
-                                :href="dashboard()"
-                                class="bg-green text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-green-alt hover:-translate-y-0.5 transition-all no-underline shadow-md shadow-green/20"
-                            >
+                            <Link :href="dashboard()"
+                                class="bg-green text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-green-alt hover:-translate-y-0.5 transition-all no-underline shadow-md shadow-green/20">
                                 Dashboard
                             </Link>
                         </template>
                         <template v-else>
-                            <Link
-                                :href="login()"
-                                class="text-navy px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-100 transition-all no-underline"
-                            >
+                            <Link :href="login()"
+                                class="text-navy px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-100 transition-all no-underline">
                                 Sign In
                             </Link>
-                            <Link
-                                :href="register()"
-                                class="bg-green text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-green-alt hover:-translate-y-0.5 transition-all no-underline shadow-md shadow-green/20"
-                            >
+                            <Link :href="register()"
+                                class="bg-green text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-green-alt hover:-translate-y-0.5 transition-all no-underline shadow-md shadow-green/20">
                                 Sign Up
                             </Link>
                         </template>
@@ -194,55 +190,38 @@ const handleAnchorClick = (e: MouseEvent, href: string) => {
                 </div>
 
                 <!-- Hamburger Menu Button (Mobile) -->
-                <button
-                    id="menu-btn"
-                    @click="toggleMobileMenu"
-                    class="md:hidden flex flex-col items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-all"
-                >
-                    <i id="menu-icon" :class="isMenuOpen ? 'ri-close-line' : 'ri-menu-line'" class="text-2xl text-navy"></i>
+                <button id="menu-btn" @click="toggleMobileMenu"
+                    class="md:hidden flex flex-col items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-all">
+                    <i id="menu-icon" :class="isMenuOpen ? 'ri-close-line' : 'ri-menu-line'"
+                        class="text-2xl text-navy"></i>
                 </button>
             </div>
 
             <!-- Mobile Menu -->
-            <div
-                id="mobile-menu"
-                :class="{ 'hidden': !isMenuOpen }"
-                class="md:hidden absolute top-[72px] left-0 right-0 bg-white/95 backdrop-blur-md shadow-lg rounded-b-2xl overflow-hidden transition-all duration-300"
-            >
+            <div id="mobile-menu" :class="{ 'hidden': !isMenuOpen }"
+                class="md:hidden absolute top-[72px] left-0 right-0 bg-white/95 backdrop-blur-md shadow-lg rounded-b-2xl overflow-hidden transition-all duration-300">
                 <ul class="flex flex-col py-4">
                     <li v-for="item in siteConfig.navItems" :key="item.name">
-                        <a
-                            :href="item.href"
-                            @click="(e) => handleAnchorClick(e, item.href)"
-                            class="block px-6 py-3 text-sm font-medium text-[#6B7280] hover:bg-gray-50 hover:text-navy transition-colors no-underline"
-                        >
+                        <a :href="item.href" @click="(e) => handleAnchorClick(e, item.href)"
+                            class="block px-6 py-3 text-sm font-medium text-[#6B7280] hover:bg-gray-50 hover:text-navy transition-colors no-underline">
                             {{ item.name }}
                         </a>
                     </li>
                 </ul>
                 <div class="flex flex-col gap-3 px-6 pb-6">
                     <template v-if="$page.props.auth.user">
-                        <Link
-                            :href="dashboard()"
-                            @click="closeMobileMenu"
-                            class="text-center bg-green text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-green-alt transition-all no-underline shadow-md shadow-green/20"
-                        >
+                        <Link :href="dashboard()" @click="closeMobileMenu"
+                            class="text-center bg-green text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-green-alt transition-all no-underline shadow-md shadow-green/20">
                             Dashboard
                         </Link>
                     </template>
                     <template v-else>
-                        <Link
-                            :href="login()"
-                            @click="closeMobileMenu"
-                            class="text-center text-navy px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-100 transition-all no-underline border border-gray-200"
-                        >
+                        <Link :href="login()" @click="closeMobileMenu"
+                            class="text-center text-navy px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-gray-100 transition-all no-underline border border-gray-200">
                             Sign In
                         </Link>
-                        <Link
-                            :href="register()"
-                            @click="closeMobileMenu"
-                            class="text-center bg-green text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-green-alt transition-all no-underline shadow-md shadow-green/20"
-                        >
+                        <Link :href="register()" @click="closeMobileMenu"
+                            class="text-center bg-green text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-green-alt transition-all no-underline shadow-md shadow-green/20">
                             Sign Up
                         </Link>
                     </template>
@@ -251,37 +230,30 @@ const handleAnchorClick = (e: MouseEvent, href: string) => {
         </nav>
 
         <!-- HERO SECTION -->
-        <section
-            id="beranda"
-            class="min-h-screen pt-[120px] pb-20 px-[max(2rem,calc((100%-1200px)/2+2rem))] grid lg:grid-cols-2 gap-16 items-center"
-        >
+        <section id="beranda"
+            class="min-h-screen pt-[120px] pb-20 px-[max(2rem,calc((100%-1200px)/2+2rem))] grid lg:grid-cols-2 gap-16 items-center">
             <div>
-                <div class="inline-flex items-center gap-2 bg-cream border border-cream-dark text-green-dark text-[0.8rem] font-bold uppercase tracking-wide px-[14px] py-[6px] rounded-full mb-6">
+                <div
+                    class="inline-flex items-center gap-2 bg-cream border border-cream-dark text-green-dark text-[0.8rem] font-bold uppercase tracking-wide px-[14px] py-[6px] rounded-full mb-6">
                     <i :class="[siteConfig.hero.badge.icon, 'text-[0.85rem]']"></i>
                     <span>{{ siteConfig.hero.badge.text }}</span>
                 </div>
-                <h1
-                    class="text-[clamp(2.8rem,5vw,4.5rem)] font-extrabold leading-[1.08] text-navy tracking-[-0.03em]"
-                    v-html="siteConfig.hero.title"
-                ></h1>
+                <h1 class="text-[clamp(2.8rem,5vw,4.5rem)] font-extrabold leading-[1.08] text-navy tracking-[-0.03em]"
+                    v-html="siteConfig.hero.title"></h1>
                 <p class="mt-6 text-[1.0625rem] leading-relaxed text-[#6B7280] max-w-[480px]">
                     {{ siteConfig.hero.description }}
                 </p>
                 <div class="mt-10 flex flex-wrap gap-3">
                     <template v-if="$page.props.auth.user">
-                        <Link
-                            :href="dashboard()"
-                            class="bg-green text-white px-7 py-[14px] rounded-[14px] text-[0.9375rem] font-bold flex items-center gap-2 hover:bg-green-alt hover:-translate-y-[2px] hover:shadow-[0_12px_24px_rgba(26,163,117,0.25)] transition-all no-underline"
-                        >
+                        <Link :href="dashboard()"
+                            class="bg-green text-white px-7 py-[14px] rounded-[14px] text-[0.9375rem] font-bold flex items-center gap-2 hover:bg-green-alt hover:-translate-y-[2px] hover:shadow-[0_12px_24px_rgba(26,163,117,0.25)] transition-all no-underline">
                             <i class="ri-dashboard-line"></i>
                             Dashboard
                         </Link>
                     </template>
                     <template v-else>
-                        <Link
-                            :href="register()"
-                            class="bg-green text-white px-7 py-[14px] rounded-[14px] text-[0.9375rem] font-bold flex items-center gap-2 hover:bg-green-alt hover:-translate-y-[2px] hover:shadow-[0_12px_24px_rgba(26,163,117,0.25)] transition-all no-underline"
-                        >
+                        <Link :href="register()"
+                            class="bg-green text-white px-7 py-[14px] rounded-[14px] text-[0.9375rem] font-bold flex items-center gap-2 hover:bg-green-alt hover:-translate-y-[2px] hover:shadow-[0_12px_24px_rgba(26,163,117,0.25)] transition-all no-underline">
                             <i :class="siteConfig.hero.buttonIcon"></i>
                             {{ siteConfig.hero.buttonText }}
                         </Link>
@@ -291,7 +263,8 @@ const handleAnchorClick = (e: MouseEvent, href: string) => {
 
             <div class="relative">
                 <div class="bg-navy-mid rounded-[28px] overflow-hidden aspect-[4/3]">
-                    <img :src="siteConfig.hero.imageUrl" alt="Finku Dashboard" class="w-full h-full object-cover opacity-85" />
+                    <img :src="siteConfig.hero.imageUrl" alt="Finku Dashboard"
+                        class="w-full h-full object-cover opacity-85" />
                 </div>
                 <div class="float-card !bottom-[-20px] !left-[-20px] min-w-[200px]">
                     <div class="text-[0.72rem] font-semibold tracking-wide uppercase text-[#6B7280] mb-1">
@@ -300,7 +273,8 @@ const handleAnchorClick = (e: MouseEvent, href: string) => {
                     <div class="text-2xl font-extrabold text-navy leading-none">
                         {{ siteConfig.balanceCard.amount }}
                     </div>
-                    <div class="inline-flex items-center gap-1 text-[0.75rem] font-semibold text-green bg-green/10 px-2 py-[3px] rounded-full mt-1.5">
+                    <div
+                        class="inline-flex items-center gap-1 text-[0.75rem] font-semibold text-green bg-green/10 px-2 py-[3px] rounded-full mt-1.5">
                         <i class="ri-arrow-up-line"></i> <span>{{ siteConfig.balanceCard.change }}</span>
                     </div>
                 </div>
@@ -309,10 +283,8 @@ const handleAnchorClick = (e: MouseEvent, href: string) => {
                         {{ siteConfig.goalCard.label }}
                     </div>
                     <div class="goal-bar-wrap bg-[#EAE7DF] rounded-full h-[6px] overflow-hidden">
-                        <div
-                            class="goal-bar-fill bg-green rounded-full h-[6px] animate-progress-slow"
-                            :style="{ '--target-percentage': siteConfig.goalCard.percentage + '%' }"
-                        ></div>
+                        <div class="goal-bar-fill bg-green rounded-full h-[6px] animate-progress-slow"
+                            :style="{ '--target-percentage': siteConfig.goalCard.percentage + '%' }"></div>
                     </div>
                     <div class="text-[1.1rem] font-extrabold text-navy leading-none mt-1.5">
                         {{ siteConfig.goalCard.percentage }}%
@@ -325,21 +297,14 @@ const handleAnchorClick = (e: MouseEvent, href: string) => {
         </section>
 
         <!-- TICKER -->
-        <div
-            class="bg-navy py-3.5 overflow-hidden relative cursor-pointer ticker-container"
-            @mouseenter="isTickerPaused = true"
-            @mouseleave="isTickerPaused = false"
-        >
-            <div
-                class="flex gap-0 w-max animate-ticker"
-                :style="{ animationPlayState: isTickerPaused ? 'paused' : 'running' }"
-            >
-                <div
-                    v-for="(item, index) in duplicatedTickerItems"
-                    :key="index"
-                    class="ticker-item flex items-center gap-3 px-10 whitespace-nowrap text-[0.825rem] font-semibold text-white/55 transition-all duration-300 hover:scale-110 hover:text-white cursor-pointer"
-                >
-                    <i :class="[item.icon, 'text-green']"></i> <strong class="text-white">{{ item.title }}</strong> — {{ item.description }}
+        <div class="bg-navy py-3.5 overflow-hidden relative cursor-pointer ticker-container"
+            @mouseenter="isTickerPaused = true" @mouseleave="isTickerPaused = false">
+            <div class="flex gap-0 w-max animate-ticker"
+                :style="{ animationPlayState: isTickerPaused ? 'paused' : 'running' }">
+                <div v-for="(item, index) in duplicatedTickerItems" :key="index"
+                    class="ticker-item flex items-center gap-3 px-10 whitespace-nowrap text-[0.825rem] font-semibold text-white/55 transition-all duration-300 hover:scale-110 hover:text-white cursor-pointer">
+                    <i :class="[item.icon, 'text-green']"></i> <strong class="text-white">{{ item.title }}</strong> — {{
+                    item.description }}
                 </div>
             </div>
         </div>
@@ -349,29 +314,28 @@ const handleAnchorClick = (e: MouseEvent, href: string) => {
             <div class="inline-flex items-center gap-2 text-green text-[0.8rem] font-bold uppercase tracking-wide mb-4">
                 <i class="ri-medal-line"></i> <span>{{ siteConfig.features.eyebrow }}</span>
             </div>
-            <h2
-                class="text-[clamp(2rem,3.5vw,3rem)] font-extrabold text-navy tracking-[-0.025em] leading-[1.15]"
-                v-html="siteConfig.features.title"
-            ></h2>
+            <h2 class="text-[clamp(2rem,3.5vw,3rem)] font-extrabold text-navy tracking-[-0.025em] leading-[1.15]"
+                v-html="siteConfig.features.title"></h2>
             <p class="mt-4 text-base leading-relaxed text-[#6B7280] max-w-[520px]">
                 {{ siteConfig.features.description }}
             </p>
             <div class="grid md:grid-cols-3 gap-6 mt-16">
-                <div
-                    v-for="(feature, index) in siteConfig.features.items"
-                    :key="index"
-                    class="group bg-white border border-cream-dark rounded-3xl p-8 feat-card hover:bg-navy hover:border-navy hover:shadow-[0_20px_48px_rgba(4,10,29,0.06)] hover:-translate-y-1 transition-all duration-300 cursor-pointer"
-                >
-                    <div class="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center text-2xl mb-6 bg-cream text-green group-hover:bg-green/15 transition-colors duration-300">
+                <div v-for="(feature, index) in siteConfig.features.items" :key="index"
+                    class="group bg-white border border-cream-dark rounded-3xl p-8 feat-card hover:bg-navy hover:border-navy hover:shadow-[0_20px_48px_rgba(4,10,29,0.06)] hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                    <div
+                        class="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center text-2xl mb-6 bg-cream text-green group-hover:bg-green/15 transition-colors duration-300">
                         <i :class="feature.icon"></i>
                     </div>
-                    <div class="text-[1.0625rem] font-bold text-navy mb-2.5 group-hover:text-white transition-colors duration-300">
+                    <div
+                        class="text-[1.0625rem] font-bold text-navy mb-2.5 group-hover:text-white transition-colors duration-300">
                         {{ feature.title }}
                     </div>
-                    <p class="text-[0.9rem] leading-relaxed text-[#6B7280] group-hover:text-white/60 transition-colors duration-300">
+                    <p
+                        class="text-[0.9rem] leading-relaxed text-[#6B7280] group-hover:text-white/60 transition-colors duration-300">
                         {{ feature.description }}
                     </p>
-                    <span class="inline-block mt-5 bg-green/10 text-green text-[0.75rem] font-bold tracking-wide px-3 py-1 rounded-full group-hover:bg-green/20 group-hover:text-[#4BDAAB] transition-colors duration-300">
+                    <span
+                        class="inline-block mt-5 bg-green/10 text-green text-[0.75rem] font-bold tracking-wide px-3 py-1 rounded-full group-hover:bg-green/20 group-hover:text-[#4BDAAB] transition-colors duration-300">
                         {{ feature.tag }}
                     </span>
                 </div>
@@ -382,25 +346,22 @@ const handleAnchorClick = (e: MouseEvent, href: string) => {
         <section id="faq" class="py-[100px] px-[max(2rem,calc((100%-1200px)/2+2rem))] bg-navy">
             <div class="grid lg:grid-cols-[1fr_1.8fr] gap-24 items-start">
                 <div class="lg:sticky lg:top-[100px]">
-                    <div class="inline-flex items-center gap-2 text-green text-[0.8rem] font-bold uppercase tracking-wide mb-4">
+                    <div
+                        class="inline-flex items-center gap-2 text-green text-[0.8rem] font-bold uppercase tracking-wide mb-4">
                         <i class="ri-question-line"></i> <span>{{ siteConfig.faqs.eyebrow }}</span>
                     </div>
-                    <h2
-                        class="text-[clamp(2rem,3.5vw,3rem)] font-extrabold text-white tracking-[-0.025em] leading-[1.15]"
-                        v-html="siteConfig.faqs.title"
-                    ></h2>
+                    <h2 class="text-[clamp(2rem,3.5vw,3rem)] font-extrabold text-white tracking-[-0.025em] leading-[1.15]"
+                        v-html="siteConfig.faqs.title"></h2>
                     <p class="mt-4 text-base leading-relaxed text-white/55 max-w-[520px]">
                         {{ siteConfig.faqs.description }}
                     </p>
                 </div>
                 <div class="flex flex-col">
-                    <div
-                        v-for="(faq, index) in siteConfig.faqs.items"
-                        :key="index"
+                    <div v-for="(faq, index) in siteConfig.faqs.items" :key="index"
                         class="faq-item border-b border-white/10 first:border-t border-white/10"
-                        :class="{ 'open': activeFaqIndex === index }"
-                    >
-                        <div @click="toggleFaq(index)" class="faq-q flex justify-between items-center gap-4 py-6 cursor-pointer">
+                        :class="{ 'open': activeFaqIndex === index }">
+                        <div @click="toggleFaq(index)"
+                            class="faq-q flex justify-between items-center gap-4 py-6 cursor-pointer">
                             <h3 class="text-[1.0625rem] font-semibold text-white">{{ faq.question }}</h3>
                             <i class="ri-add-line text-xl text-green flex-shrink-0"></i>
                         </div>
@@ -417,7 +378,7 @@ const handleAnchorClick = (e: MouseEvent, href: string) => {
             <div class="grid md:grid-cols-[2fr_1fr] gap-12 pb-12 border-b border-gray-200">
                 <div>
                     <div class="flex items-center gap-2 text-2xl font-extrabold text-navy mb-4">
-                        <AppLogo class="text-2xl font-normal"/>
+                        <AppLogo class="text-2xl font-normal" />
                     </div>
                     <p class="text-[0.9rem] leading-relaxed text-gray-500 max-w-[480px]">
                         {{ siteConfig.footer.description }}
@@ -427,7 +388,8 @@ const handleAnchorClick = (e: MouseEvent, href: string) => {
                     <h4 class="text-[0.8rem] font-bold tracking-wide uppercase text-gray-400 mb-5">{{ col.title }}</h4>
                     <ul class="flex flex-col gap-3">
                         <li v-for="(link, lIndex) in col.links" :key="lIndex">
-                            <a :href="link.url" @click="(e) => handleAnchorClick(e, link.url)" class="text-[0.9rem] text-gray-500 hover:text-green transition-colors no-underline">
+                            <a :href="link.url" @click="(e) => handleAnchorClick(e, link.url)"
+                                class="text-[0.9rem] text-gray-500 hover:text-green transition-colors no-underline">
                                 {{ link.label }}
                             </a>
                         </li>
@@ -504,6 +466,7 @@ const handleAnchorClick = (e: MouseEvent, href: string) => {
     0% {
         transform: translateX(0);
     }
+
     100% {
         transform: translateX(-50%);
     }
@@ -513,6 +476,7 @@ const handleAnchorClick = (e: MouseEvent, href: string) => {
     0% {
         width: 0%;
     }
+
     100% {
         width: var(--target-percentage, 72%);
     }

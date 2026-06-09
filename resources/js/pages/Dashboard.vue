@@ -162,7 +162,7 @@ const getProgressBarColor = (percent: number) => {
                     </span>
                     <h1 class="text-3xl font-extrabold tracking-tight mt-3">Halo, {{ user.name }}!</h1>
                     <p class="text-white/80 mt-1">Siap menaikkan level finansialmu hari ini? Catat keuanganmu & kumpulkan XP!</p>
-                    
+
                     <!-- Dynamic Cash Flow Indicator -->
                     <div class="mt-4 flex items-center gap-2 text-sm bg-white/15 backdrop-blur-md rounded-xl p-3 border border-white/10 w-fit">
                         <TrendingUp v-if="summary.actual_income >= (summary.spent_needs + summary.spent_wants)" class="w-4 h-4 text-emerald-300" />
@@ -172,7 +172,7 @@ const getProgressBarColor = (percent: number) => {
                 </div>
 
                 <!-- Quick Navigation Action -->
-                <div class="flex gap-3 mt-6">
+                <div class="flex flex-wrap gap-3 mt-6">
                     <Button variant="secondary" class="bg-white text-emerald-800 hover:bg-white/95 shadow-md font-medium" @click="router.visit('/expenses')">
                         <Plus class="w-4 h-4 mr-2" /> Catat Pengeluaran
                     </Button>

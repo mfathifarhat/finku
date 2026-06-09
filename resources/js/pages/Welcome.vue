@@ -417,8 +417,7 @@ const handleAnchorClick = (e: MouseEvent, href: string) => {
             <div class="grid md:grid-cols-[2fr_1fr] gap-12 pb-12 border-b border-gray-200">
                 <div>
                     <div class="flex items-center gap-2 text-2xl font-extrabold text-navy mb-4">
-                        <i class="ri-bar-chart-2-line text-green text-[1.4rem]"></i>
-                        Fin<span class="text-green">ku</span>
+                        <AppLogo class="text-2xl font-normal"/>
                     </div>
                     <p class="text-[0.9rem] leading-relaxed text-gray-500 max-w-[480px]">
                         {{ siteConfig.footer.description }}

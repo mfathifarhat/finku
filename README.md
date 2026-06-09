@@ -1,5 +1,7 @@
 # FinKu - AI-Powered Gamified Financial Assistant 🚀
 
+🌐 **Live Demo**: [https://ncpakjapan.my.id/](https://ncpakjapan.my.id/)
+
 **FinKu** adalah aplikasi asisten pengelolaan keuangan pribadi yang dinamis, interaktif, dan tergamifikasi. Dirancang khusus untuk membantu pengguna muda di Indonesia mengelola arus kas bulanan secara cerdas dan menyenangkan. Aplikasi ini menggabungkan pencatatan keuangan pintar, analisis tren visual, pelacakan target tabungan, obrolan interaktif AI (chatbot), serta sistem leveling dan pencapaian lencana (badges).
 
 ---

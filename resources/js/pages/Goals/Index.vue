@@ -125,7 +125,7 @@ const iconsList = ['🎯', '🏠', '🚗', '🎓', '✈️', '💻', '💼', '�
 </script>
 
 <template>
-    <Head title="Target Tabungan - Finku" />
+    <Head title="Target Tabungan" />
 
     <div class="flex flex-1 flex-col gap-6 p-6 max-w-7xl mx-auto w-full">
         

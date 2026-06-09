@@ -179,39 +179,11 @@ Berikan hasil analisis Anda dalam format JSON yang valid.";
             }
         }
 
-        // Local Simulation Fallback
-        $mocks = [
-            [
-                'amount' => 1500000,
-                'category' => 'Sampingan',
-                'description' => 'Simulasi Scan: Hasil Proyek Freelance'
-            ],
-            [
-                'amount' => 4500000,
-                'category' => 'Gaji',
-                'description' => 'Simulasi Scan: Gaji Bulanan Payroll'
-            ],
-            [
-                'amount' => 200000,
-                'category' => 'Hadiah',
-                'description' => 'Simulasi Scan: Kado / Hadiah'
-            ],
-            [
-                'amount' => 50000,
-                'category' => 'Investasi',
-                'description' => 'Simulasi Scan: Dividen Saham'
-            ],
-        ];
-
-        $randomMock = $mocks[array_rand($mocks)];
-        $randomMock['date'] = now()->format('Y-m-d');
-
-        usleep(800000); // 800ms
-
+        // If Gemini is inactive or empty, return inactive state warning
         return response()->json([
-            'success' => true,
-            'data' => $randomMock,
-            'message' => 'Simulasi Scan: Bukti transfer dipindai oleh sistem lokal (Offline Fallback).'
+            'success' => false,
+            'error' => 'ai_inactive',
+            'message' => 'Mohon maaf, AI Scan sedang tidak aktif karena token habis.'
         ]);
     }
 }

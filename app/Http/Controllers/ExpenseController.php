@@ -258,56 +258,11 @@ Berikan hasil analisis Anda dalam format JSON yang valid.";
             }
         }
 
-        // Local Fallback / Simulation
-        $mocks = [
-            [
-                'amount' => 45000,
-                'category' => 'Makanan',
-                'type' => 'wants',
-                'description' => 'Simulasi Scan: Kopi & Roti Bakar'
-            ],
-            [
-                'amount' => 125000,
-                'category' => 'Belanja',
-                'type' => 'needs',
-                'description' => 'Simulasi Scan: Belanja Mingguan Minimarket'
-            ],
-            [
-                'amount' => 50000,
-                'category' => 'Transportasi',
-                'type' => 'needs',
-                'description' => 'Simulasi Scan: Pengisian Bahan Bakar Kendaraan'
-            ],
-            [
-                'amount' => 85000,
-                'category' => 'Hiburan',
-                'type' => 'wants',
-                'description' => 'Simulasi Scan: Tiket Bioskop & Popcorn'
-            ],
-            [
-                'amount' => 350000,
-                'category' => 'Tagihan',
-                'type' => 'needs',
-                'description' => 'Simulasi Scan: Pembayaran Tagihan Listrik Bulanan'
-            ],
-            [
-                'amount' => 15000,
-                'category' => 'Makanan',
-                'type' => 'needs',
-                'description' => 'Simulasi Scan: Nasi Goreng Kaki Lima'
-            ],
-        ];
-
-        $randomMock = $mocks[array_rand($mocks)];
-        $randomMock['date'] = now()->format('Y-m-d');
-
-        // Give the fallback a short artificial delay to simulate OCR scanning
-        usleep(800000); // 800ms
-
+        // If Gemini is inactive or empty, return inactive state warning
         return response()->json([
-            'success' => true,
-            'data' => $randomMock,
-            'message' => 'Simulasi Scan: Struk berhasil dipindai oleh sistem lokal (Offline Fallback).'
+            'success' => false,
+            'error' => 'ai_inactive',
+            'message' => 'Mohon maaf, AI Scan sedang tidak aktif karena token habis.'
         ]);
     }
 }

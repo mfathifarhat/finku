@@ -94,7 +94,17 @@ Tugasmu:
 3. Jika pengguna bertanya tentang naik level atau quest lencana, ingatkan mereka untuk rajin mencatat pengeluaran (+10 XP) dan menabung (+15 XP).
 4. Buat tanggapan yang ringkas, mudah dipahami, dan batasi hingga 2-3 paragraf pendek agar nyaman dibaca di layar chat kecil.";
 
-        // 3. Invoke Gemini API if Key is set
+        // 3. If force_offline is requested, go directly to local fallback
+        if ($request->force_offline) {
+            $response = $this->getLocalFallbackResponse($userMessage, $user, $spentNeeds, $limitNeeds, $spentWants, $limitWants, $activeGoals, $needsPercent, $wantsPercent, $income);
+            return response()->json([
+                'success' => true,
+                'text' => $response,
+                'mode' => 'local_fallback'
+            ]);
+        }
+
+        // 4. Invoke Gemini API if Key is set
         $apiKey = config('services.gemini.key');
         $model = config('services.gemini.model', 'gemini-1.5-flash');
 
@@ -146,13 +156,11 @@ Tugasmu:
             }
         }
 
-        // 4. Local Rules-Based Chat Fallback
-        $response = $this->getLocalFallbackResponse($userMessage, $user, $spentNeeds, $limitNeeds, $spentWants, $limitWants, $activeGoals, $needsPercent, $wantsPercent, $income);
-
+        // 5. If API is not configured or failed, return inactive state to let user switch to offline mode
         return response()->json([
-            'success' => true,
-            'text' => $response,
-            'mode' => 'local_fallback'
+            'success' => false,
+            'error' => 'ai_inactive',
+            'message' => 'Mohon maaf AI sedang tidak aktif'
         ]);
     }
 

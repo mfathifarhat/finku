@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
 import {
     Plus,
@@ -13,6 +13,7 @@ import {
     Sparkles,
     Loader2,
     Camera,
+    CameraOff,
     TrendingUp,
     TrendingDown,
     ArrowDownRight,
@@ -27,6 +28,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 defineOptions({
     layout: {
@@ -113,8 +115,11 @@ const editIncomeForm = useForm({
 const isScanning = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
 const scanSuccessMsg = ref('');
+const scanErrorMsg = ref('');
+const isAiScannerActive = ref(true);
 
 const triggerFileSelect = () => {
+    if (!isAiScannerActive.value) return;
     fileInput.value?.click();
 };
 
@@ -122,8 +127,10 @@ const triggerFileSelect = () => {
 const isScanningIncome = ref(false);
 const incomeFileInput = ref<HTMLInputElement | null>(null);
 const scanIncomeSuccessMsg = ref('');
+const scanIncomeErrorMsg = ref('');
 
 const triggerIncomeFileSelect = () => {
+    if (!isAiScannerActive.value) return;
     incomeFileInput.value?.click();
 };
 
@@ -137,6 +144,7 @@ const onIncomeFileSelected = async (event: Event) => {
 
     isScanningIncome.value = true;
     scanIncomeSuccessMsg.value = '';
+    scanIncomeErrorMsg.value = '';
 
     try {
         const xsrfToken = getCookie('XSRF-TOKEN');
@@ -159,12 +167,15 @@ const onIncomeFileSelected = async (event: Event) => {
             addIncomeForm.description = data.description;
             
             scanIncomeSuccessMsg.value = result.message || 'Bukti transfer berhasil dipindai!';
+        } else if (result.error === 'ai_inactive') {
+            isAiScannerActive.value = false;
+            scanIncomeErrorMsg.value = result.message || 'Mohon maaf, AI Scan sedang tidak aktif karena token habis.';
         } else {
-            alert(result.message || 'Gagal memindai bukti transfer. Pastikan file gambar Anda berupa bukti transfer bank.');
+            scanIncomeErrorMsg.value = result.message || 'Gagal memindai bukti transfer. Pastikan file gambar Anda berupa bukti transfer bank.';
         }
     } catch (e) {
         console.error(e);
-        alert('Terjadi kesalahan saat memproses gambar bukti transfer.');
+        scanIncomeErrorMsg.value = 'Terjadi kesalahan saat memproses gambar bukti transfer.';
     } finally {
         isScanningIncome.value = false;
         if (incomeFileInput.value) {
@@ -190,6 +201,7 @@ const onFileSelected = async (event: Event) => {
 
     isScanning.value = true;
     scanSuccessMsg.value = '';
+    scanErrorMsg.value = '';
 
     try {
         const xsrfToken = getCookie('XSRF-TOKEN');
@@ -213,12 +225,15 @@ const onFileSelected = async (event: Event) => {
             addExpenseForm.description = data.description;
             
             scanSuccessMsg.value = result.message || 'Struk berhasil dipindai!';
+        } else if (result.error === 'ai_inactive') {
+            isAiScannerActive.value = false;
+            scanErrorMsg.value = result.message || 'Mohon maaf, AI Scan sedang tidak aktif karena token habis.';
         } else {
-            alert(result.message || 'Gagal memindai struk. Pastikan file gambar Anda berupa struk belanja.');
+            scanErrorMsg.value = result.message || 'Gagal memindai struk. Pastikan file gambar Anda berupa struk belanja.';
         }
     } catch (e) {
         console.error(e);
-        alert('Terjadi kesalahan saat memproses gambar struk.');
+        scanErrorMsg.value = 'Terjadi kesalahan saat memproses gambar struk.';
     } finally {
         isScanning.value = false;
         if (fileInput.value) {
@@ -257,6 +272,7 @@ const storeExpense = () => {
             showAddExpenseDialog.value = false;
             addExpenseForm.reset('amount', 'description');
             scanSuccessMsg.value = '';
+            scanErrorMsg.value = '';
         }
     });
 };
@@ -294,6 +310,7 @@ const storeIncome = () => {
             showAddIncomeDialog.value = false;
             addIncomeForm.reset('amount', 'description');
             scanIncomeSuccessMsg.value = '';
+            scanIncomeErrorMsg.value = '';
         }
     });
 };
@@ -339,10 +356,25 @@ const totalExpensesSum = () => {
 const totalIncomesSum = () => {
     return props.incomes.reduce((sum, item) => sum + Number(item.amount), 0);
 };
+
+// Reset dialog error/success messages on close
+watch(showAddExpenseDialog, (val) => {
+    if (!val) {
+        scanSuccessMsg.value = '';
+        scanErrorMsg.value = '';
+    }
+});
+
+watch(showAddIncomeDialog, (val) => {
+    if (!val) {
+        scanIncomeSuccessMsg.value = '';
+        scanIncomeErrorMsg.value = '';
+    }
+});
 </script>
 
 <template>
-    <Head title="Riwayat Transaksi Keuangan - Finku" />
+    <Head title="Riwayat Transaksi Keuangan" />
 
     <div class="flex flex-1 flex-col gap-6 p-6 max-w-7xl mx-auto w-full">
 
@@ -612,13 +644,35 @@ const totalIncomesSum = () => {
                     </DialogDescription>
                 </DialogHeader>
 
+                <!-- Warning Alert if AI is inactive -->
+                <Alert v-if="!isAiScannerActive" variant="destructive" class="mt-2 bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400">
+                    <AlertCircle class="h-4 w-4 text-red-600 dark:text-red-400" />
+                    <AlertTitle class="font-bold">AI Scan Tidak Aktif</AlertTitle>
+                    <AlertDescription>
+                        Mohon maaf, fitur scan otomatis menggunakan AI sedang dinonaktifkan karena token Gemini telah habis. Silakan input transaksi secara manual di bawah.
+                    </AlertDescription>
+                </Alert>
+
                 <!-- AI OCR Receipt Scan Area -->
-                <div class="mt-2 p-4 rounded-xl border border-dashed border-emerald-300 bg-emerald-50/40 text-center flex flex-col items-center justify-center gap-2 transition-all hover:bg-emerald-50/70 dark:bg-emerald-950/10 dark:border-emerald-800 dark:hover:bg-emerald-950/20">
+                <div 
+                    class="mt-2 p-4 rounded-xl border border-dashed text-center flex flex-col items-center justify-center gap-2 transition-all"
+                    :class="isAiScannerActive 
+                        ? 'border-emerald-300 bg-emerald-50/40 hover:bg-emerald-50/70 dark:bg-emerald-950/10 dark:border-emerald-800 dark:hover:bg-emerald-950/20 cursor-pointer' 
+                        : 'border-slate-350 bg-slate-100 opacity-70 dark:bg-slate-900 dark:border-slate-800'"
+                    @click="isAiScannerActive ? triggerFileSelect() : null"
+                >
                     <div v-if="isScanning" class="flex flex-col items-center gap-2 py-2">
                         <Loader2 class="w-7 h-7 text-emerald-600 animate-spin" />
                         <p class="text-sm font-semibold text-emerald-800 dark:text-emerald-300 animate-pulse">Sedang memindai struk Anda dengan AI...</p>
                     </div>
-                    <div v-else class="flex flex-col items-center gap-1.5 w-full cursor-pointer" @click="triggerFileSelect">
+                    <div v-else-if="!isAiScannerActive" class="flex flex-col items-center gap-1.5 w-full py-2">
+                        <div class="p-2 rounded-full bg-slate-200 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                            <CameraOff class="w-5 h-5" />
+                        </div>
+                        <span class="text-sm font-bold text-slate-500 dark:text-slate-400">AI Scan Tidak Aktif</span>
+                        <span class="text-xs text-red-500 dark:text-red-400 font-semibold">Mohon maaf, AI Scan sedang tidak aktif (token habis).</span>
+                    </div>
+                    <div v-else class="flex flex-col items-center gap-1.5 w-full">
                         <div class="p-2 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300">
                             <Camera class="w-5 h-5" />
                         </div>
@@ -634,6 +688,14 @@ const totalIncomesSum = () => {
                     <div>
                         <span class="font-bold">Berhasil memindai:</span> {{ scanSuccessMsg }}
                         <p class="mt-0.5 text-slate-500 dark:text-slate-400">Silakan tinjau kembali data di bawah sebelum menyimpan.</p>
+                    </div>
+                </div>
+
+                <!-- Toast Error Scan -->
+                <div v-if="scanErrorMsg" class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-2 dark:bg-rose-950/20 dark:border-rose-900/50 dark:text-rose-300">
+                    <AlertCircle class="w-4.5 h-4.5 text-rose-600 shrink-0 mt-0.5" />
+                    <div>
+                        <span class="font-bold">Gagal memindai:</span> {{ scanErrorMsg }}
                     </div>
                 </div>
 
@@ -714,13 +776,35 @@ const totalIncomesSum = () => {
                     </DialogDescription>
                 </DialogHeader>
 
+                <!-- Warning Alert if AI is inactive -->
+                <Alert v-if="!isAiScannerActive" variant="destructive" class="mt-2 bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400">
+                    <AlertCircle class="h-4 w-4 text-red-600 dark:text-red-400" />
+                    <AlertTitle class="font-bold">AI Scan Tidak Aktif</AlertTitle>
+                    <AlertDescription>
+                        Mohon maaf, fitur scan otomatis menggunakan AI sedang dinonaktifkan karena token Gemini telah habis. Silakan input transaksi secara manual di bawah.
+                    </AlertDescription>
+                </Alert>
+
                 <!-- AI OCR Bukti Transfer Scan Area -->
-                <div class="mt-2 p-4 rounded-xl border border-dashed border-emerald-300 bg-emerald-50/40 text-center flex flex-col items-center justify-center gap-2 transition-all hover:bg-emerald-50/70 dark:bg-emerald-950/10 dark:border-emerald-800 dark:hover:bg-emerald-950/20">
+                <div 
+                    class="mt-2 p-4 rounded-xl border border-dashed text-center flex flex-col items-center justify-center gap-2 transition-all"
+                    :class="isAiScannerActive 
+                        ? 'border-emerald-300 bg-emerald-50/40 hover:bg-emerald-50/70 dark:bg-emerald-950/10 dark:border-emerald-800 dark:hover:bg-emerald-950/20 cursor-pointer' 
+                        : 'border-slate-350 bg-slate-100 opacity-70 dark:bg-slate-900 dark:border-slate-800'"
+                    @click="isAiScannerActive ? triggerIncomeFileSelect() : null"
+                >
                     <div v-if="isScanningIncome" class="flex flex-col items-center gap-2 py-2">
                         <Loader2 class="w-7 h-7 text-emerald-600 animate-spin" />
                         <p class="text-sm font-semibold text-emerald-800 dark:text-emerald-300 animate-pulse">Sedang memindai bukti transfer Anda dengan AI...</p>
                     </div>
-                    <div v-else class="flex flex-col items-center gap-1.5 w-full cursor-pointer" @click="triggerIncomeFileSelect">
+                    <div v-else-if="!isAiScannerActive" class="flex flex-col items-center gap-1.5 w-full py-2">
+                        <div class="p-2 rounded-full bg-slate-200 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                            <CameraOff class="w-5 h-5" />
+                        </div>
+                        <span class="text-sm font-bold text-slate-500 dark:text-slate-400">AI Scan Tidak Aktif</span>
+                        <span class="text-xs text-red-500 dark:text-red-400 font-semibold">Mohon maaf, AI Scan sedang tidak aktif (token habis).</span>
+                    </div>
+                    <div v-else class="flex flex-col items-center gap-1.5 w-full">
                         <div class="p-2 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300">
                             <Camera class="w-5 h-5" />
                         </div>
@@ -736,6 +820,14 @@ const totalIncomesSum = () => {
                     <div>
                         <span class="font-bold">Berhasil memindai:</span> {{ scanIncomeSuccessMsg }}
                         <p class="mt-0.5 text-slate-500 dark:text-slate-400">Silakan tinjau kembali data di bawah sebelum menyimpan.</p>
+                    </div>
+                </div>
+
+                <!-- Toast Error Scan -->
+                <div v-if="scanIncomeErrorMsg" class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-2 dark:bg-rose-950/20 dark:border-rose-900/50 dark:text-rose-300">
+                    <AlertCircle class="w-4.5 h-4.5 text-rose-600 shrink-0 mt-0.5" />
+                    <div>
+                        <span class="font-bold">Gagal memindai:</span> {{ scanIncomeErrorMsg }}
                     </div>
                 </div>
 

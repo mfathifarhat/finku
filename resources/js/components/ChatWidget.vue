@@ -22,6 +22,8 @@ onMounted(() => {
 const isOpen = ref(false);
 const isTyping = ref(false);
 const inputMessage = ref('');
+const isOfflineMode = ref(false);
+const showOfflineOption = ref(false);
 const messages = ref<Message[]>([
     {
         role: 'model',
@@ -59,6 +61,7 @@ const sendMessage = async (text: string) => {
     messages.value.push({ role: 'user', text });
     inputMessage.value = '';
     isTyping.value = true;
+    showOfflineOption.value = false;
 
     try {
         const xsrfToken = getCookie('XSRF-TOKEN');
@@ -72,7 +75,8 @@ const sendMessage = async (text: string) => {
             method: 'POST',
             body: JSON.stringify({
                 message: text,
-                history: historyPayload
+                history: historyPayload,
+                force_offline: isOfflineMode.value
             }),
             headers: {
                 'Content-Type': 'application/json',
@@ -88,21 +92,38 @@ const sendMessage = async (text: string) => {
                 role: 'model',
                 text: result.text
             });
+        } else if (result.error === 'ai_inactive') {
+            messages.value.push({
+                role: 'model',
+                text: 'Mohon maaf, layanan AI saat ini sedang tidak aktif (kuota token habis).'
+            });
+            showOfflineOption.value = true;
         } else {
             messages.value.push({
                 role: 'model',
-                text: 'Maaf Kak, aku sedang mengalami kendala jaringan. Coba tanyakan lagi dalam beberapa saat ya!'
+                text: 'Mohon maaf, layanan AI sedang tidak aktif.'
             });
+            showOfflineOption.value = true;
         }
     } catch (e) {
         console.error(e);
         messages.value.push({
             role: 'model',
-            text: 'Duh, ada gangguan koneksi nih. Boleh coba ketik pesanmu sekali lagi?'
+            text: 'Mohon maaf, AI sedang tidak aktif karena gangguan koneksi.'
         });
+        showOfflineOption.value = true;
     } finally {
         isTyping.value = false;
     }
+};
+
+const switchToOfflineMode = () => {
+    isOfflineMode.value = true;
+    showOfflineOption.value = false;
+    messages.value.push({
+        role: 'model',
+        text: '🟢 **Asisten Offline Aktif!** Halo Kak, sekarang Finku-AI berjalan dalam mode lokal. Kakak tetap bisa bertanya seputar:\n- *Kondisi keuangan & pembagian budget*\n- *Status over-budget / boros*\n- *Tips hemat dan menabung*\n- *Misi quest gamifikasi & level XP*'
+    });
 };
 
 const sendQuickPrompt = (promptText: string) => {
@@ -172,7 +193,10 @@ const formatMessageText = (text: string) => {
                         <h3 class="font-bold text-sm flex items-center gap-1.5">
                             Finku-AI <Sparkles class="w-3.5 h-3.5 text-amber-300" />
                         </h3>
-                        <p class="text-xs text-emerald-100">Asisten Keuangan Cerdas</p>
+                        <p class="text-xs text-emerald-100 flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full" :class="isOfflineMode ? 'bg-amber-400 animate-pulse' : 'bg-emerald-400'"></span>
+                            {{ isOfflineMode ? 'Mode Offline (Aktif)' : 'Asisten Keuangan Cerdas' }}
+                        </p>
                     </div>
                 </div>
                 <button 
@@ -232,6 +256,19 @@ const formatMessageText = (text: string) => {
                     class="text-xs font-semibold px-3 py-1.5 bg-white border border-slate-200 rounded-full text-slate-600 hover:border-emerald-500 hover:text-emerald-600 transition-colors shrink-0 shadow-sm cursor-pointer"
                 >
                     🎮 Naik Level
+                </button>
+            </div>
+
+            <!-- Offline Mode Option Warning -->
+            <div v-if="showOfflineOption" class="px-4 py-3 bg-amber-50 border-t border-amber-100 flex flex-col gap-2">
+                <p class="text-xs text-amber-800 leading-normal">
+                    ⚠️ <strong>Layanan AI sedang tidak aktif.</strong> Silakan beralih ke Asisten Offline FinKu untuk tetap menanyakan analisis budget, target tabungan, dan gamifikasi.
+                </p>
+                <button 
+                    @click="switchToOfflineMode"
+                    class="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors cursor-pointer"
+                >
+                    Aktifkan Asisten Offline
                 </button>
             </div>
 

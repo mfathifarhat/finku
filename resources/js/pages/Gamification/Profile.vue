@@ -70,7 +70,7 @@ const getBadgeIconColor = (iconName: string) => {
 </script>
 
 <template>
-    <Head title="Level & Lencana Pencapaian - Finku" />
+    <Head title="Level & Lencana Pencapaian" />
 
     <div class="flex flex-1 flex-col gap-6 p-6 max-w-7xl mx-auto w-full">
 

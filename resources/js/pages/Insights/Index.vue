@@ -182,7 +182,7 @@ const getRecommendationColorClass = (type: Recommendation['type']) => {
 </script>
 
 <template>
-    <Head title="Analisis Finansial AI - Finku" />
+    <Head title="Analisis Finansial AI" />
 
     <div class="flex flex-1 flex-col gap-6 p-6 max-w-7xl mx-auto w-full">
 

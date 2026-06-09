@@ -5,6 +5,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\GamificationController;
 use App\Http\Controllers\InsightController;
+use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
@@ -27,6 +28,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('gamification', [GamificationController::class, 'index'])->name('gamification.index');
 
     Route::get('insights', [InsightController::class, 'index'])->name('insights.index');
+
+    Route::post('ai/chat', [ChatController::class, 'chat'])->name('ai.chat');
 });
 
 require __DIR__.'/settings.php';

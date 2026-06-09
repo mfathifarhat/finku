@@ -188,9 +188,9 @@ const getRecommendationColorClass = (type: Recommendation['type']) => {
 
         <!-- Header -->
         <div class="flex items-center gap-4">
-            <Button variant="ghost" size="icon" class="h-9 w-9 text-slate-500" @click="router.visit('/dashboard')">
+            <!-- <Button variant="ghost" size="icon" class="h-9 w-9 text-slate-500" @click="router.visit('/dashboard')">
                 <ArrowLeft class="w-4 h-4" />
-            </Button>
+            </Button> -->
             <div>
                 <h1 class="text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100 flex items-center gap-2">
                     <Sparkles class="w-6 h-6 text-emerald-500" /> Analisis AI & Tren Pengeluaran

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->unsignedInteger('level')->default(1);
             $table->unsignedBigInteger('monthly_income')->default(0);
             $table->string('budgeting_method')->default('50-30-20');
-            $table->text('custom_budget_percentages')->default('{"needs": 50, "wants": 30, "savings": 20}');
+            $table->text('custom_budget_percentages')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

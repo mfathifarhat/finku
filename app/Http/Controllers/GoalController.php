@@ -42,10 +42,20 @@ class GoalController extends Controller
         ]);
 
         // Award 20 XP for setting a goal
-        $user->addXp(20);
+        $xpResult = $user->addXp(20);
+        if ($xpResult['leveled_up']) {
+            session()->flash('level_up', $xpResult['current_level']);
+        }
 
         // Check achievements
         $newBadges = $user->checkBadges();
+        if (count($newBadges) > 0) {
+            session()->flash('new_badges', collect($newBadges)->map(fn($b) => [
+                'name' => $b->name,
+                'icon' => $b->icon,
+                'description' => $b->description,
+            ])->toArray());
+        }
 
         $msg = 'Target tabungan berhasil dibuat! +20 XP';
         if (count($newBadges) > 0) {
@@ -77,10 +87,20 @@ class GoalController extends Controller
         ]);
 
         // Award 15 XP for saving money
-        $user->addXp(15);
+        $xpResult = $user->addXp(15);
+        if ($xpResult['leveled_up']) {
+            session()->flash('level_up', $xpResult['current_level']);
+        }
 
         // Check achievements
         $newBadges = $user->checkBadges();
+        if (count($newBadges) > 0) {
+            session()->flash('new_badges', collect($newBadges)->map(fn($b) => [
+                'name' => $b->name,
+                'icon' => $b->icon,
+                'description' => $b->description,
+            ])->toArray());
+        }
 
         $msg = 'Tabungan berhasil ditambahkan! +15 XP';
         if ($completed) {

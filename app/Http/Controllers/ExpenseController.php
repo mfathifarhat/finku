@@ -56,10 +56,20 @@ class ExpenseController extends Controller
         ]);
 
         // Award 10 XP for logging an expense
-        $user->addXp(10);
+        $xpResult = $user->addXp(10);
+        if ($xpResult['leveled_up']) {
+            session()->flash('level_up', $xpResult['current_level']);
+        }
 
         // Check for new achievements
         $newBadges = $user->checkBadges();
+        if (count($newBadges) > 0) {
+            session()->flash('new_badges', collect($newBadges)->map(fn($b) => [
+                'name' => $b->name,
+                'icon' => $b->icon,
+                'description' => $b->description,
+            ])->toArray());
+        }
 
         // Calculate limit warnings
         $totalSpent = $user->expenses()

@@ -19,8 +19,11 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements PasskeyUser
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
+
+    protected $attributes = [
+        'custom_budget_percentages' => '{"needs": 50, "wants": 30, "savings": 20}',
+    ];
 
     public function expenses(): HasMany
     {

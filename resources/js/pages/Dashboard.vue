@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
-import { 
-    LayoutGrid, 
-    Coins, 
-    TrendingUp, 
-    Wallet, 
-    Award, 
-    Trophy, 
-    Target, 
-    Plus, 
-    Sparkles, 
-    Info, 
-    Check, 
+import {
+    LayoutGrid,
+    Coins,
+    TrendingUp,
+    Wallet,
+    Award,
+    Trophy,
+    Target,
+    Plus,
+    Sparkles,
+    Info,
+    Check,
     DollarSign,
     Lock,
     Settings
@@ -148,10 +148,10 @@ const getProgressBarColor = (percent: number) => {
     <Head title="Dashboard - Finku" />
 
     <div class="flex flex-1 flex-col gap-6 p-6 max-w-7xl mx-auto w-full">
-        
+
         <!-- Header Section with Gamification Level & XP -->
         <div class="grid gap-6 md:grid-cols-3">
-            
+
             <!-- Welcome User -->
             <div class="md:col-span-2 flex flex-col justify-between p-6 rounded-2xl bg-gradient-to-r from-emerald-600/90 to-teal-600/90 text-white shadow-xl overflow-hidden relative group">
                 <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
@@ -162,13 +162,13 @@ const getProgressBarColor = (percent: number) => {
                     <h1 class="text-3xl font-extrabold tracking-tight mt-3">Halo, {{ user.name }}!</h1>
                     <p class="text-white/80 mt-1">Siap menaikkan level finansialmu hari ini? Catat keuanganmu & kumpulkan XP!</p>
                 </div>
-                
+
                 <!-- Quick Navigation Action -->
                 <div class="flex gap-3 mt-6">
                     <Button variant="secondary" class="bg-white text-emerald-800 hover:bg-white/95 shadow-md font-medium" @click="router.visit('/expenses')">
                         <Plus class="w-4 h-4 mr-2" /> Catat Pengeluaran
                     </Button>
-                    <Button variant="outline" class="border-white/40 text-white hover:bg-white/10 font-medium" @click="showSettingsDialog = true">
+                    <Button variant="outline" class="bg-white text-emerald-800 hover:bg-white/95 shadow-md font-medium" @click="showSettingsDialog = true">
                         <Settings class="w-4 h-4 mr-2" /> Atur Anggaran
                     </Button>
                 </div>
@@ -190,7 +190,7 @@ const getProgressBarColor = (percent: number) => {
                         {{ user.xp }} / {{ user.xp_needed }} XP
                     </span>
                 </div>
-                
+
                 <!-- XP Bar -->
                 <div class="mt-4">
                     <div class="flex justify-between text-xs text-slate-500 mb-1.5 font-medium">
@@ -198,8 +198,8 @@ const getProgressBarColor = (percent: number) => {
                         <span>{{ Math.round((user.xp / user.xp_needed) * 100) }}%</span>
                     </div>
                     <div class="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200/50 dark:border-slate-800">
-                        <div 
-                            class="h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-500 rounded-full" 
+                        <div
+                            class="h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-500 rounded-full"
                             :style="{ width: `${(user.xp / user.xp_needed) * 100}%` }"
                         ></div>
                     </div>
@@ -214,7 +214,7 @@ const getProgressBarColor = (percent: number) => {
 
         <!-- Financial Summary Cards -->
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            
+
             <!-- Pendapatan -->
             <Card class="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-md">
                 <CardContent class="p-6 flex items-center justify-between">
@@ -273,12 +273,12 @@ const getProgressBarColor = (percent: number) => {
 
         <!-- Budget Progress & AI Insights -->
         <div class="grid gap-6 md:grid-cols-5">
-            
+
             <!-- Budget Allocation Tracker -->
             <div class="md:col-span-3 p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl">
                 <h2 class="text-lg font-bold text-slate-800 dark:text-slate-100">Status Alokasi Anggaran</h2>
                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Persentase pengeluaran terhadap batas alokasi metode <strong>{{ user.budgeting_method }}</strong></p>
-                
+
                 <div class="mt-6 flex flex-col gap-6">
                     <!-- Needs Progress -->
                     <div>
@@ -287,13 +287,13 @@ const getProgressBarColor = (percent: number) => {
                                 <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Kebutuhan (Needs)
                             </span>
                             <span class="font-semibold text-slate-800 dark:text-slate-200">
-                                {{ formatRupiah(summary.spent_needs) }} / {{ formatRupiah(summary.limit_needs) }} 
+                                {{ formatRupiah(summary.spent_needs) }} / {{ formatRupiah(summary.limit_needs) }}
                                 <span class="text-xs text-slate-500 font-normal">({{ getPercent(summary.spent_needs, summary.limit_needs) }}%)</span>
                             </span>
                         </div>
                         <div class="w-full h-3.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200/50 dark:border-slate-800">
-                            <div 
-                                class="h-full transition-all duration-500 rounded-full" 
+                            <div
+                                class="h-full transition-all duration-500 rounded-full"
                                 :class="getProgressBarColor(getPercent(summary.spent_needs, summary.limit_needs))"
                                 :style="{ width: `${getPercent(summary.spent_needs, summary.limit_needs)}%` }"
                             ></div>
@@ -312,8 +312,8 @@ const getProgressBarColor = (percent: number) => {
                             </span>
                         </div>
                         <div class="w-full h-3.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200/50 dark:border-slate-800">
-                            <div 
-                                class="h-full transition-all duration-500 rounded-full" 
+                            <div
+                                class="h-full transition-all duration-500 rounded-full"
                                 :class="getProgressBarColor(getPercent(summary.spent_wants, summary.limit_wants))"
                                 :style="{ width: `${getPercent(summary.spent_wants, summary.limit_wants)}%` }"
                             ></div>
@@ -332,8 +332,8 @@ const getProgressBarColor = (percent: number) => {
                             </span>
                         </div>
                         <div class="w-full h-3.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200/50 dark:border-slate-800">
-                            <div 
-                                class="h-full bg-gradient-to-r from-amber-500 to-yellow-500 transition-all duration-500 rounded-full" 
+                            <div
+                                class="h-full bg-gradient-to-r from-amber-500 to-yellow-500 transition-all duration-500 rounded-full"
                                 :style="{ width: `${getPercent(summary.spent_savings, summary.limit_savings)}%` }"
                             ></div>
                         </div>
@@ -346,16 +346,16 @@ const getProgressBarColor = (percent: number) => {
                 <div class="absolute right-0 top-0 opacity-10 pointer-events-none">
                     <Sparkles class="w-48 h-48 text-emerald-400" />
                 </div>
-                
+
                 <div>
                     <div class="flex items-center gap-2 text-emerald-400 text-sm font-semibold tracking-wide uppercase">
                         <Sparkles class="w-4.5 h-4.5" /> AI Financial Advisor
                     </div>
                     <h3 class="text-lg font-bold mt-2">Rekomendasi Cerdas</h3>
-                    
+
                     <div class="mt-4 flex flex-col gap-3">
-                        <div 
-                            v-for="(insight, index) in ai_insights" 
+                        <div
+                            v-for="(insight, index) in ai_insights"
                             :key="index"
                             class="p-3 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 text-sm leading-relaxed"
                         >
@@ -375,7 +375,7 @@ const getProgressBarColor = (percent: number) => {
 
         <!-- Recent Expenses and Saving Goals -->
         <div class="grid gap-6 md:grid-cols-2">
-            
+
             <!-- Recent Expenses -->
             <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl">
                 <div class="flex items-center justify-between mb-4">
@@ -391,13 +391,13 @@ const getProgressBarColor = (percent: number) => {
                     <div v-if="recent_expenses.length === 0" class="text-center py-6 text-sm text-slate-400">
                         Belum ada pengeluaran dicatat bulan ini.
                     </div>
-                    <div 
-                        v-for="expense in recent_expenses" 
+                    <div
+                        v-for="expense in recent_expenses"
                         :key="expense.id"
                         class="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800"
                     >
                         <div class="flex items-center gap-3">
-                            <span 
+                            <span
                                 class="w-2.5 h-2.5 rounded-full"
                                 :class="expense.type === 'needs' ? 'bg-blue-500' : 'bg-purple-500'"
                                 :title="expense.type === 'needs' ? 'Kebutuhan' : 'Keinginan'"
@@ -430,8 +430,8 @@ const getProgressBarColor = (percent: number) => {
                     <div v-if="recent_goals.length === 0" class="text-center py-6 text-sm text-slate-400">
                         Belum ada target tabungan dibuat.
                     </div>
-                    <div 
-                        v-for="goal in recent_goals" 
+                    <div
+                        v-for="goal in recent_goals"
                         :key="goal.id"
                         class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 flex flex-col gap-2"
                     >
@@ -443,14 +443,14 @@ const getProgressBarColor = (percent: number) => {
                                     <div class="text-xs text-slate-400">Target: {{ goal.target_date }}</div>
                                 </div>
                             </div>
-                            <span 
+                            <span
                                 class="text-xs font-semibold px-2 py-0.5 rounded-full"
                                 :class="goal.completed ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'"
                             >
                                 {{ goal.completed ? 'Tercapai' : 'Aktif' }}
                             </span>
                         </div>
-                        
+
                         <!-- Mini progress bar -->
                         <div>
                             <div class="flex justify-between text-xs text-slate-500 mb-1">
@@ -458,7 +458,7 @@ const getProgressBarColor = (percent: number) => {
                                 <span>{{ getPercent(goal.current_amount, goal.target_amount) }}%</span>
                             </div>
                             <div class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                                <div 
+                                <div
                                     class="h-full bg-amber-500 transition-all duration-300"
                                     :style="{ width: `${getPercent(goal.current_amount, goal.target_amount)}%` }"
                                 ></div>
@@ -483,10 +483,10 @@ const getProgressBarColor = (percent: number) => {
                     <!-- Pendapatan input -->
                     <div class="grid gap-2">
                         <Label for="monthly_income" class="text-slate-700 dark:text-slate-300 font-medium">Pendapatan Bulanan (Rupiah)</Label>
-                        <Input 
-                            id="monthly_income" 
-                            type="number" 
-                            v-model="form.monthly_income" 
+                        <Input
+                            id="monthly_income"
+                            type="number"
+                            v-model="form.monthly_income"
                             placeholder="Contoh: 5000000"
                             class="bg-slate-50 dark:bg-slate-800"
                         />
@@ -529,7 +529,7 @@ const getProgressBarColor = (percent: number) => {
 
                 <DialogFooter>
                     <Button variant="outline" class="border-slate-200" @click="showSettingsDialog = false">Batal</Button>
-                    <Button 
+                    <Button
                         class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow"
                         :disabled="form.processing || (form.budgeting_method === 'custom' && (parseInt(form.needs) + parseInt(form.wants) + parseInt(form.savings) !== 100))"
                         @click="saveSettings"

@@ -1,44 +1,44 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
-import { 
-    TrendingUp, 
-    Sparkles, 
-    AlertTriangle, 
-    Info, 
-    CheckCircle, 
-    AlertOctagon, 
-    Activity, 
-    PieChart, 
+import {
+    TrendingUp,
+    Sparkles,
+    AlertTriangle,
+    Info,
+    CheckCircle,
+    AlertOctagon,
+    Activity,
+    PieChart,
     ArrowLeft
 } from '@lucide/vue';
 
-// UI Components
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-
 // ChartJS setup
-import { Pie, Bar } from 'vue-chartjs';
-import { 
-    Chart as ChartJS, 
-    Title, 
-    Tooltip, 
-    Legend, 
-    ArcElement, 
-    CategoryScale, 
-    LinearScale, 
+import {
+    Chart as ChartJS,
+    Title,
+    Tooltip,
+    Legend,
+    ArcElement,
+    CategoryScale,
+    LinearScale,
     BarElement,
     PointElement,
     LineElement
 } from 'chart.js';
+import { computed } from 'vue';
+import { Pie, Bar } from 'vue-chartjs';
+import { Button } from '@/components/ui/button';
+
+// UI Components
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 ChartJS.register(
-    Title, 
-    Tooltip, 
-    Legend, 
-    ArcElement, 
-    CategoryScale, 
-    LinearScale, 
+    Title,
+    Tooltip,
+    Legend,
+    ArcElement,
+    CategoryScale,
+    LinearScale,
     BarElement,
     PointElement,
     LineElement
@@ -111,7 +111,7 @@ const allocationChartOptions = {
 const categoryChartData = computed(() => {
     const labels = props.categoryBreakdown.map(c => c.category);
     const data = props.categoryBreakdown.map(c => c.total);
-    
+
     return {
         labels: labels.length > 0 ? labels : ['Belum Ada Data'],
         datasets: [
@@ -185,7 +185,7 @@ const getRecommendationColorClass = (type: Recommendation['type']) => {
     <Head title="Analisis Finansial AI - Finku" />
 
     <div class="flex flex-1 flex-col gap-6 p-6 max-w-7xl mx-auto w-full">
-        
+
         <!-- Header -->
         <div class="flex items-center gap-4">
             <Button variant="ghost" size="icon" class="h-9 w-9 text-slate-500" @click="router.visit('/dashboard')">
@@ -202,15 +202,15 @@ const getRecommendationColorClass = (type: Recommendation['type']) => {
         </div>
 
         <!-- AI Insight Recommendations -->
-        <div class="p-6 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 text-white shadow-xl relative overflow-hidden border border-slate-850">
+        <div class="p-6 rounded-2xl bg-white dark:bg-gradient-to-r dark:from-slate-900 dark:to-slate-950 dark:text-white shadow-xl relative overflow-hidden border border-slate-850">
             <h2 class="text-lg font-bold flex items-center gap-2 text-emerald-400">
                 <Sparkles class="w-5 h-5" /> Laporan Rekomendasi Finansial AI
             </h2>
             <p class="text-xs text-slate-400 mt-0.5">Saran otomatis berdasarkan pencatatan transaksi terbarumu.</p>
-            
+
             <div class="mt-6 flex flex-col gap-4">
-                <div 
-                    v-for="(rec, index) in recommendations" 
+                <div
+                    v-for="(rec, index) in recommendations"
                     :key="index"
                     class="p-4 rounded-xl border flex gap-3.5 backdrop-blur-sm"
                     :class="getRecommendationColorClass(rec.type)"
@@ -226,7 +226,7 @@ const getRecommendationColorClass = (type: Recommendation['type']) => {
 
         <!-- Charts Layout -->
         <div class="grid gap-6 md:grid-cols-2">
-            
+
             <!-- Allocation Pie Chart -->
             <Card class="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-md">
                 <CardHeader>
@@ -272,8 +272,8 @@ const getRecommendationColorClass = (type: Recommendation['type']) => {
                 <div v-if="dailyTrend.length === 0" class="text-center py-6 text-sm text-slate-400">
                     Belum ada riwayat pengeluaran dalam 30 hari terakhir.
                 </div>
-                <div 
-                    v-for="trend in dailyTrend" 
+                <div
+                    v-for="trend in dailyTrend"
                     :key="trend.date"
                     class="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800"
                 >

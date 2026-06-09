@@ -22,7 +22,7 @@ class GamificationController extends Controller
                 'icon' => $badge->icon,
                 'code' => $badge->code,
                 'unlocked' => $userBadge !== null,
-                'unlocked_at' => ($userBadge && $userBadge->pivot && $userBadge->pivot->created_at) ? $userBadge->pivot->created_at->diffForHumans() : null,
+                'unlocked_at' => ($userBadge && $userBadge->pivot && $userBadge->pivot->created_at instanceof \Carbon\Carbon) ? $userBadge->pivot->created_at->diffForHumans() : null,
             ];
         });
 

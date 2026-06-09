@@ -105,7 +105,7 @@ const rightNavItems: NavItem[] = [];
                                 >Navigation menu</SheetTitle
                             >
                             <SheetHeader class="flex justify-start text-left">
-                                <AppLogoIcon
+                                <AppLogo
                                     class="size-6 fill-current text-black dark:text-white"
                                 />
                             </SheetHeader>

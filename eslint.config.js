@@ -74,6 +74,7 @@ export default defineConfigWithVueTs(
     },
     {
         ignores: [
+            '**/*.d.ts',
             'vendor',
             'node_modules',
             'public',

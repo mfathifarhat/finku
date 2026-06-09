@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Head, useForm, router } from '@inertiajs/vue3';
-import { 
-    Plus, 
-    Trash2, 
-    Edit2, 
-    Wallet, 
-    Filter, 
-    Check, 
-    AlertCircle, 
+import {
+    Plus,
+    Trash2,
+    Edit2,
+    Wallet,
+    Filter,
+    Check,
+    AlertCircle,
     ArrowLeft,
-    Sparkles
+    Sparkles,
+    Loader2,
+    Camera
 } from '@lucide/vue';
 
 // UI Components
@@ -20,6 +22,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import Separator from '@/components/ui/separator/Separator.vue';
 
 defineOptions({
     layout: {
@@ -60,6 +63,69 @@ const addForm = useForm({
     description: '',
     type: 'needs',
 });
+
+// Scan Receipt / Struk Setup
+const isScanning = ref(false);
+const fileInput = ref<HTMLInputElement | null>(null);
+const scanSuccessMsg = ref('');
+
+const triggerFileSelect = () => {
+    fileInput.value?.click();
+};
+
+const getCookie = (name: string): string => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return decodeURIComponent(parts.pop()?.split(';').shift() || '');
+    return '';
+};
+
+const onFileSelected = async (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    if (!target.files || target.files.length === 0) return;
+
+    const file = target.files[0];
+    const formData = new FormData();
+    formData.append('receipt', file);
+
+    isScanning.value = true;
+    scanSuccessMsg.value = '';
+
+    try {
+        const xsrfToken = getCookie('XSRF-TOKEN');
+        const response = await fetch('/expenses/scan', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': xsrfToken,
+                'Accept': 'application/json',
+            }
+        });
+
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            const data = result.data;
+            addForm.amount = data.amount.toString();
+            addForm.category = data.category;
+            addForm.type = data.type;
+            addForm.date = data.date;
+            addForm.description = data.description;
+            
+            scanSuccessMsg.value = result.message || 'Struk berhasil dipindai!';
+        } else {
+            alert(result.message || 'Gagal memindai struk. Pastikan file gambar Anda berupa struk belanja.');
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Terjadi kesalahan saat memproses gambar struk.');
+    } finally {
+        isScanning.value = false;
+        if (fileInput.value) {
+            fileInput.value.value = '';
+        }
+    }
+};
 
 const editForm = useForm({
     amount: 0,
@@ -131,31 +197,36 @@ const formatRupiah = (value: number) => {
 </script>
 
 <template>
+
     <Head title="Pencatatan Pengeluaran - Finku" />
 
     <div class="flex flex-1 flex-col gap-6 p-6 max-w-7xl mx-auto w-full">
-        
+
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                <h1
+                    class="text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100 flex items-center gap-2">
                     <Wallet class="w-6 h-6 text-emerald-500" /> Log Pengeluaran
                 </h1>
                 <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
                     Catat pengeluaran harianmu secara rapi dan pisahkan antara Kebutuhan (Needs) & Keinginan (Wants).
                 </p>
             </div>
-            
-            <Button class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow" @click="showAddDialog = true">
+
+            <Button class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow"
+                @click="showAddDialog = true">
                 <Plus class="w-4 h-4 mr-2" /> Catat Pengeluaran
             </Button>
         </div>
 
         <!-- Filters Section -->
-        <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md flex flex-wrap gap-4 items-end">
+        <div
+            class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md flex flex-wrap gap-4 items-end">
             <!-- Filter Type -->
             <div class="grid gap-1.5 flex-1 min-w-[200px]">
-                <Label for="filter_type" class="text-xs font-semibold text-slate-500 dark:text-slate-400">Jenis Kategori</Label>
+                <Label for="filter_type" class="text-xs font-semibold text-slate-500 dark:text-slate-400">Jenis
+                    Kategori</Label>
                 <Select v-model="filterType" @update:model-value="applyFilters">
                     <SelectTrigger class="bg-slate-50 dark:bg-slate-800">
                         <SelectValue placeholder="Semua Jenis" />
@@ -170,7 +241,8 @@ const formatRupiah = (value: number) => {
 
             <!-- Filter Category -->
             <div class="grid gap-1.5 flex-1 min-w-[200px]">
-                <Label for="filter_category" class="text-xs font-semibold text-slate-500 dark:text-slate-400">Pos Kategori</Label>
+                <Label for="filter_category" class="text-xs font-semibold text-slate-500 dark:text-slate-400">Pos
+                    Kategori</Label>
                 <Select v-model="filterCategory" @update:model-value="applyFilters">
                     <SelectTrigger class="bg-slate-50 dark:bg-slate-800">
                         <SelectValue placeholder="Semua Kategori" />
@@ -199,7 +271,8 @@ const formatRupiah = (value: number) => {
             <CardContent>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left text-slate-500 dark:text-slate-400">
-                        <thead class="text-xs text-slate-700 dark:text-slate-300 uppercase bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+                        <thead
+                            class="text-xs text-slate-700 dark:text-slate-300 uppercase bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
                             <tr>
                                 <th scope="col" class="px-6 py-3 font-semibold">Status</th>
                                 <th scope="col" class="px-6 py-3 font-semibold">Kategori</th>
@@ -216,26 +289,19 @@ const formatRupiah = (value: number) => {
                                     Belum ada transaksi pengeluaran yang dicatat.
                                 </td>
                             </tr>
-                            <tr 
-                                v-for="expense in expenses" 
-                                :key="expense.id"
-                                class="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/80 hover:bg-slate-50/50 dark:hover:bg-slate-800/30"
-                            >
+                            <tr v-for="expense in expenses" :key="expense.id"
+                                class="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/80 hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
                                 <td class="px-6 py-4">
-                                    <span 
-                                        class="inline-block w-2.5 h-2.5 rounded-full"
+                                    <span class="inline-block w-2.5 h-2.5 rounded-full"
                                         :class="expense.type === 'needs' ? 'bg-blue-500' : 'bg-purple-500'"
-                                        :title="expense.type === 'needs' ? 'Kebutuhan' : 'Keinginan'"
-                                    ></span>
+                                        :title="expense.type === 'needs' ? 'Kebutuhan' : 'Keinginan'"></span>
                                 </td>
                                 <td class="px-6 py-4 font-semibold text-slate-800 dark:text-slate-200">
                                     {{ expense.category }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span 
-                                        class="text-xs font-semibold px-2.5 py-0.5 rounded-full"
-                                        :class="expense.type === 'needs' ? 'bg-blue-50 text-blue-800 dark:bg-blue-950 dark:text-blue-300' : 'bg-purple-50 text-purple-800 dark:bg-purple-950 dark:text-purple-300'"
-                                    >
+                                    <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full"
+                                        :class="expense.type === 'needs' ? 'bg-blue-50 text-blue-800 dark:bg-blue-950 dark:text-blue-300' : 'bg-purple-50 text-purple-800 dark:bg-purple-950 dark:text-purple-300'">
                                         {{ expense.type === 'needs' ? 'Needs' : 'Wants' }}
                                     </span>
                                 </td>
@@ -249,10 +315,13 @@ const formatRupiah = (value: number) => {
                                     {{ formatRupiah(expense.amount) }}
                                 </td>
                                 <td class="px-6 py-4 text-right flex justify-end gap-2">
-                                    <Button variant="ghost" size="icon" class="h-8 w-8 text-slate-500" @click="editExpense(expense)">
+                                    <Button variant="ghost" size="icon" class="h-8 w-8 text-slate-500"
+                                        @click="editExpense(expense)">
                                         <Edit2 class="w-3.5 h-3.5" />
                                     </Button>
-                                    <Button variant="ghost" size="icon" class="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20" @click="deleteExpense(expense.id)">
+                                    <Button variant="ghost" size="icon"
+                                        class="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
+                                        @click="deleteExpense(expense.id)">
                                         <Trash2 class="w-3.5 h-3.5" />
                                     </Button>
                                 </td>
@@ -271,26 +340,49 @@ const formatRupiah = (value: number) => {
                         <Wallet class="w-5 h-5 text-emerald-500" /> Catat Pengeluaran Baru
                     </DialogTitle>
                     <DialogDescription class="text-slate-500">
-                        Catat pengeluaran Anda hari ini. Aksi ini juga akan menambahkan **+10 XP** ke karakter finansialmu!
+                        Catat pengeluaran Anda hari ini. Aksi ini juga akan menambahkan <b>+10 XP</b> ke karakter
+                        finansialmu!
                     </DialogDescription>
                 </DialogHeader>
 
-                <div class="grid gap-4 py-4">
+                <!-- Area Scan Struk AI -->
+                <div class="mt-2 p-4 rounded-xl border border-dashed border-emerald-300 bg-emerald-50/40 text-center flex flex-col items-center justify-center gap-2 transition-all hover:bg-emerald-50/70 dark:bg-emerald-950/10 dark:border-emerald-800 dark:hover:bg-emerald-950/20">
+                    <div v-if="isScanning" class="flex flex-col items-center gap-2 py-2">
+                        <Loader2 class="w-7 h-7 text-emerald-600 animate-spin" />
+                        <p class="text-sm font-semibold text-emerald-800 dark:text-emerald-300 animate-pulse">Sedang memindai struk Anda dengan AI...</p>
+                    </div>
+                    <div v-else class="flex flex-col items-center gap-1.5 w-full cursor-pointer" @click="triggerFileSelect">
+                        <div class="p-2 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300">
+                            <Camera class="w-5 h-5" />
+                        </div>
+                        <span class="text-sm font-bold text-slate-800 dark:text-slate-200">Scan Struk / Nota dengan AI</span>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">Unggah foto struk untuk mengisi form di bawah secara otomatis</span>
+                        <input type="file" ref="fileInput" class="hidden" accept="image/*" @change="onFileSelected" />
+                    </div>
+                </div>
+
+                <!-- Toast/Alert Success Scan -->
+                <div v-if="scanSuccessMsg" class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-start gap-2 dark:bg-emerald-950/20 dark:border-emerald-800 dark:text-emerald-300">
+                    <Check class="w-4.5 h-4.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <div>
+                        <span class="font-bold">Berhasil memindai:</span> {{ scanSuccessMsg }}
+                        <p class="mt-0.5 text-slate-500 dark:text-slate-400">Silakan tinjau kembali data di bawah sebelum menyimpan.</p>
+                    </div>
+                </div>
+
+                <div class="grid gap-4 py-2">
                     <!-- Jumlah Uang -->
                     <div class="grid gap-2">
-                        <Label for="amount" class="text-slate-700 dark:text-slate-300 font-medium">Jumlah Pengeluaran (Rupiah)</Label>
-                        <Input 
-                            id="amount" 
-                            type="number" 
-                            v-model="addForm.amount" 
-                            placeholder="Contoh: 50000"
-                            class="bg-slate-50 dark:bg-slate-800"
-                        />
+                        <Label for="amount" class="text-slate-700 dark:text-slate-300 font-medium">Jumlah Pengeluaran
+                            (Rupiah)</Label>
+                        <Input id="amount" type="number" v-model="addForm.amount" placeholder="Contoh: 50000"
+                            class="bg-slate-50 dark:bg-slate-800" />
                     </div>
 
                     <!-- Kategori -->
                     <div class="grid gap-2">
-                        <Label for="category" class="text-slate-700 dark:text-slate-300 font-medium">Pos Kategori</Label>
+                        <Label for="category" class="text-slate-700 dark:text-slate-300 font-medium">Pos
+                            Kategori</Label>
                         <Select v-model="addForm.category">
                             <SelectTrigger class="bg-slate-50 dark:bg-slate-800">
                                 <SelectValue placeholder="Pilih Kategori" />
@@ -305,14 +397,16 @@ const formatRupiah = (value: number) => {
 
                     <!-- Tipe (Needs/Wants) -->
                     <div class="grid gap-2">
-                        <Label for="type" class="text-slate-700 dark:text-slate-300 font-medium">Jenis Pengeluaran</Label>
+                        <Label for="type" class="text-slate-700 dark:text-slate-300 font-medium">Jenis
+                            Pengeluaran</Label>
                         <Select v-model="addForm.type">
                             <SelectTrigger class="bg-slate-50 dark:bg-slate-800">
                                 <SelectValue placeholder="Pilih Jenis" />
                             </SelectTrigger>
                             <SelectContent class="bg-white dark:bg-slate-900">
                                 <SelectItem value="needs">Needs (Kebutuhan Pokok, Transportasi, Cicilan)</SelectItem>
-                                <SelectItem value="wants">Wants (Belanja Impulsif, Nongkrong, Liburan, Hiburan)</SelectItem>
+                                <SelectItem value="wants">Wants (Belanja Impulsif, Nongkrong, Liburan, Hiburan)
+                                </SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -320,39 +414,31 @@ const formatRupiah = (value: number) => {
                     <!-- Tanggal -->
                     <div class="grid gap-2">
                         <Label for="date" class="text-slate-700 dark:text-slate-300 font-medium">Tanggal</Label>
-                        <Input 
-                            id="date" 
-                            type="date" 
-                            v-model="addForm.date" 
-                            class="bg-slate-50 dark:bg-slate-800"
-                        />
+                        <Input id="date" type="date" v-model="addForm.date" class="bg-slate-50 dark:bg-slate-800" />
                     </div>
 
                     <!-- Keterangan -->
                     <div class="grid gap-2">
-                        <Label for="description" class="text-slate-700 dark:text-slate-300 font-medium">Deskripsi / Keterangan</Label>
-                        <Input 
-                            id="description" 
-                            v-model="addForm.description" 
-                            placeholder="Contoh: Beli makan siang nasi padang"
-                            class="bg-slate-50 dark:bg-slate-800"
-                        />
+                        <Label for="description" class="text-slate-700 dark:text-slate-300 font-medium">Deskripsi /
+                            Keterangan</Label>
+                        <Input id="description" v-model="addForm.description"
+                            placeholder="Contoh: Beli makan siang nasi padang" class="bg-slate-50 dark:bg-slate-800" />
                     </div>
                 </div>
 
-                <DialogFooter class="flex items-center justify-between">
-                    <span class="text-xs text-amber-500 font-semibold flex items-center gap-1.5">
-                        <Sparkles class="w-3.5 h-3.5" /> Dapatkan +10 XP
-                    </span>
-                    <div class="flex gap-2">
-                        <Button variant="outline" class="border-slate-200" @click="showAddDialog = false">Batal</Button>
-                        <Button 
-                            class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow"
-                            :disabled="addForm.processing"
-                            @click="storeExpense"
-                        >
-                            Simpan Pengeluaran
-                        </Button>
+                <DialogFooter>
+                    <div class="flex items-center justify-between w-full">
+                        <span class="text-xs text-amber-500 font-semibold flex items-center gap-1.5">
+                            <Sparkles class="w-3.5 h-3.5" /> Dapatkan +10 XP
+                        </span>
+                        <div class="flex gap-2">
+                            <Button variant="outline" class="border-slate-200"
+                                @click="showAddDialog = false">Batal</Button>
+                            <Button class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow"
+                                :disabled="addForm.processing || isScanning" @click="storeExpense">
+                                Simpan Pengeluaran
+                            </Button>
+                        </div>
                     </div>
                 </DialogFooter>
             </DialogContent>
@@ -373,18 +459,16 @@ const formatRupiah = (value: number) => {
                 <div class="grid gap-4 py-4">
                     <!-- Jumlah Uang -->
                     <div class="grid gap-2">
-                        <Label for="edit_amount" class="text-slate-700 dark:text-slate-300 font-medium">Jumlah Pengeluaran (Rupiah)</Label>
-                        <Input 
-                            id="edit_amount" 
-                            type="number" 
-                            v-model="editForm.amount" 
-                            class="bg-slate-50 dark:bg-slate-800"
-                        />
+                        <Label for="edit_amount" class="text-slate-700 dark:text-slate-300 font-medium">Jumlah
+                            Pengeluaran (Rupiah)</Label>
+                        <Input id="edit_amount" type="number" v-model="editForm.amount"
+                            class="bg-slate-50 dark:bg-slate-800" />
                     </div>
 
                     <!-- Kategori -->
                     <div class="grid gap-2">
-                        <Label for="edit_category" class="text-slate-700 dark:text-slate-300 font-medium">Pos Kategori</Label>
+                        <Label for="edit_category" class="text-slate-700 dark:text-slate-300 font-medium">Pos
+                            Kategori</Label>
                         <Select v-model="editForm.category">
                             <SelectTrigger class="bg-slate-50 dark:bg-slate-800">
                                 <SelectValue placeholder="Pilih Kategori" />
@@ -399,7 +483,8 @@ const formatRupiah = (value: number) => {
 
                     <!-- Tipe (Needs/Wants) -->
                     <div class="grid gap-2">
-                        <Label for="edit_type" class="text-slate-700 dark:text-slate-300 font-medium">Jenis Pengeluaran</Label>
+                        <Label for="edit_type" class="text-slate-700 dark:text-slate-300 font-medium">Jenis
+                            Pengeluaran</Label>
                         <Select v-model="editForm.type">
                             <SelectTrigger class="bg-slate-50 dark:bg-slate-800">
                                 <SelectValue placeholder="Pilih Jenis" />
@@ -414,32 +499,23 @@ const formatRupiah = (value: number) => {
                     <!-- Tanggal -->
                     <div class="grid gap-2">
                         <Label for="edit_date" class="text-slate-700 dark:text-slate-300 font-medium">Tanggal</Label>
-                        <Input 
-                            id="edit_date" 
-                            type="date" 
-                            v-model="editForm.date" 
-                            class="bg-slate-50 dark:bg-slate-800"
-                        />
+                        <Input id="edit_date" type="date" v-model="editForm.date"
+                            class="bg-slate-50 dark:bg-slate-800" />
                     </div>
 
                     <!-- Keterangan -->
                     <div class="grid gap-2">
-                        <Label for="edit_description" class="text-slate-700 dark:text-slate-300 font-medium">Deskripsi / Keterangan</Label>
-                        <Input 
-                            id="edit_description" 
-                            v-model="editForm.description" 
-                            class="bg-slate-50 dark:bg-slate-800"
-                        />
+                        <Label for="edit_description" class="text-slate-700 dark:text-slate-300 font-medium">Deskripsi /
+                            Keterangan</Label>
+                        <Input id="edit_description" v-model="editForm.description"
+                            class="bg-slate-50 dark:bg-slate-800" />
                     </div>
                 </div>
 
                 <DialogFooter>
                     <Button variant="outline" class="border-slate-200" @click="showEditDialog = false">Batal</Button>
-                    <Button 
-                        class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow"
-                        :disabled="editForm.processing"
-                        @click="updateExpense"
-                    >
+                    <Button class="bg-emerald-600 hover:bg-emerald-500 text-white font-medium shadow"
+                        :disabled="editForm.processing" @click="updateExpense">
                         Simpan Perubahan
                     </Button>
                 </DialogFooter>

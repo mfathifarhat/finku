@@ -58,6 +58,9 @@ class GamificationController extends Controller
             'user' => [
                 'name' => $user->name,
                 'level' => $user->level,
+                'level_label' => $user->level_label,
+                'streak_count' => $user->streak_count,
+                'last_activity_date' => $user->last_activity_date,
                 'xp' => $user->xp,
                 'xp_needed' => $user->level * 100,
             ],

@@ -28,8 +28,18 @@ class IncomeController extends Controller
 
         // Award 10 XP for logging income
         $xpResult = $user->addXp(10);
-        if ($xpResult['leveled_up']) {
-            session()->flash('level_up', $xpResult['current_level']);
+        $leveledUp = $xpResult['leveled_up'];
+        $currentLevel = $xpResult['current_level'];
+
+        // Update Daily Streak
+        $streakResult = $user->updateStreak();
+        if ($streakResult['updated'] && $streakResult['leveled_up']) {
+            $leveledUp = true;
+            $currentLevel = $streakResult['current_level'];
+        }
+
+        if ($leveledUp) {
+            session()->flash('level_up', $currentLevel);
         }
 
         // Check for new achievements/badges
@@ -43,6 +53,9 @@ class IncomeController extends Controller
         }
 
         $msg = 'Pemasukan berhasil dicatat! +10 XP';
+        if ($streakResult['updated']) {
+            $msg .= " Streak Harian: {$streakResult['streak_count']} hari (+{$streakResult['bonus_xp']} XP!)";
+        }
         if (count($newBadges) > 0) {
             $badgeNames = collect($newBadges)->pluck('name')->join(', ');
             $msg .= " Lencana Baru Dibuka: {$badgeNames}!";

@@ -41,14 +41,28 @@ class DatabaseSeeder extends Seeder
             'icon' => 'Award',
         ]);
 
-        // Test User
-        User::factory()->create([
-            'name' => 'User Finku',
-            'email' => 'user@finku.com',
-            'password' => bcrypt('password'),
-            'xp' => 120,
-            'level' => 1,
-            'monthly_income' => 5000000, // Rp 5.000.000
+        Badge::updateOrCreate(['code' => 'pejuang_konsisten'], [
+            'name' => 'Pejuang Konsisten',
+            'description' => 'Mencapai 3 hari daily streak berturut-turut dalam mencatat keuangan.',
+            'icon' => 'Flame',
         ]);
+
+        Badge::updateOrCreate(['code' => 'master_streak'], [
+            'name' => 'Master Streak',
+            'description' => 'Mencapai 7 hari daily streak berturut-turut dalam mencatat keuangan.',
+            'icon' => 'Flame',
+        ]);
+
+        // Test User
+        if (!User::where('email', 'user@finku.com')->exists()) {
+            User::factory()->create([
+                'name' => 'User Finku',
+                'email' => 'user@finku.com',
+                'password' => bcrypt('password'),
+                'xp' => 120,
+                'level' => 1,
+                'monthly_income' => 5000000, // Rp 5.000.000
+            ]);
+        }
     }
 }

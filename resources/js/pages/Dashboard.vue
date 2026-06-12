@@ -15,7 +15,8 @@ import {
     Check,
     DollarSign,
     Lock,
-    Settings
+    Settings,
+    Flame
 } from '@lucide/vue';
 import { dashboard } from '@/routes';
 
@@ -44,6 +45,8 @@ interface User {
     email: string;
     xp: number;
     level: number;
+    level_label: string;
+    streak_count: number;
     monthly_income: number;
     budgeting_method: string;
     custom_budget_percentages: {
@@ -157,9 +160,20 @@ const getProgressBarColor = (percent: number) => {
             <div class="md:col-span-2 flex flex-col justify-between p-6 rounded-2xl bg-gradient-to-r from-emerald-600/90 to-teal-600/90 text-white shadow-xl overflow-hidden relative group">
                 <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
                 <div>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-md">
-                        <Sparkles class="w-3.5 h-3.5" /> Gamified Finance
-                    </span>
+                    <!-- Header Badges -->
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-md">
+                            <Sparkles class="w-3.5 h-3.5" /> Gamified Finance
+                        </span>
+                        <span v-if="user.streak_count > 0" class="inline-flex items-center gap-1 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md animate-pulse">
+                            <Flame class="w-3.5 h-3.5 fill-red-500 text-red-500" /> 🔥 {{ user.streak_count }} Hari Beruntun
+                        </span>
+                        <span v-else class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-white/70">
+                            <Flame class="w-3.5 h-3.5 text-white/50" /> Mulai Streak Hari Ini!
+                        </span>
+                    </div>
+
+                    <!-- Greeting & Cash Flow -->
                     <h1 class="text-3xl font-extrabold tracking-tight mt-3">Halo, {{ user.name }}!</h1>
                     <p class="text-white/80 mt-1">Siap menaikkan level finansialmu hari ini? Catat keuanganmu & kumpulkan XP!</p>
 
@@ -172,7 +186,7 @@ const getProgressBarColor = (percent: number) => {
                 </div>
 
                 <!-- Quick Navigation Action -->
-                <div class="flex flex-wrap gap-3 mt-6">
+                <div class="flex flex-wrap items-center gap-3 mt-6">
                     <Button variant="secondary" class="bg-white text-emerald-800 hover:bg-white/95 shadow-md font-medium" @click="router.visit('/expenses')">
                         <Plus class="w-4 h-4 mr-2" /> Catat Pengeluaran
                     </Button>
@@ -191,7 +205,12 @@ const getProgressBarColor = (percent: number) => {
                         </div>
                         <div>
                             <div class="text-xs text-slate-500 dark:text-slate-400">Level Keuangan</div>
-                            <div class="text-lg font-bold text-slate-800 dark:text-slate-100">Level {{ user.level }}</div>
+                            <div class="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+                                Level {{ user.level }} 
+                                <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 border border-amber-500/20 whitespace-nowrap">
+                                    {{ user.level_label }}
+                                </span>
+                            </div>
                         </div>
                     </div>
                     <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">

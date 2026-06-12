@@ -9,7 +9,9 @@ import {
     ShieldCheck,
     Target,
     TrendingUp,
-    HelpCircle
+    HelpCircle,
+    Flame,
+    Calendar
 } from '@lucide/vue';
 
 // UI Components
@@ -38,6 +40,9 @@ interface Badge {
 interface User {
     name: string;
     level: number;
+    level_label: string;
+    streak_count: number;
+    last_activity_date: string | null;
     xp: number;
     xp_needed: number;
 }
@@ -54,6 +59,7 @@ const getBadgeIconComponent = (iconName: string) => {
         case 'ShieldCheck': return ShieldCheck;
         case 'TrendingUp': return TrendingUp;
         case 'Award': return Award;
+        case 'Flame': return Flame;
         default: return Trophy;
     }
 };
@@ -64,6 +70,7 @@ const getBadgeIconColor = (iconName: string) => {
         case 'ShieldCheck': return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
         case 'TrendingUp': return 'text-amber-500 bg-amber-500/10 border-amber-500/20';
         case 'Award': return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20';
+        case 'Flame': return 'text-orange-500 bg-orange-500/10 border-orange-500/20';
         default: return 'text-indigo-500 bg-indigo-500/10 border-indigo-500/20';
     }
 };
@@ -99,7 +106,7 @@ const getBadgeIconColor = (iconName: string) => {
                 <div class="w-32 h-32 rounded-3xl bg-gradient-to-br from-amber-500 to-yellow-300 p-0.5 shadow-2xl relative animate-pulse">
                     <div class="w-full h-full rounded-[22px] bg-slate-950 flex flex-col items-center justify-center border border-white/5">
                         <Trophy class="w-14 h-14 text-amber-400" />
-                        <span class="text-xs font-black text-amber-400 tracking-widest uppercase mt-1">Finku Elite</span>
+                        <span class="text-[10px] font-black text-amber-400 tracking-wider uppercase mt-1 px-1 text-center truncate w-full">{{ user.level_label }}</span>
                     </div>
                     <div class="absolute -bottom-3 -right-3 bg-amber-500 text-slate-950 text-xs font-black px-2.5 py-1 rounded-full shadow-lg border border-slate-950">
                         LV.{{ user.level }}
@@ -129,6 +136,101 @@ const getBadgeIconColor = (iconName: string) => {
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Daily Streak Tracker -->
+        <div class="grid gap-6 md:grid-cols-3">
+            <div class="md:col-span-2 p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl relative overflow-hidden flex flex-col justify-between">
+                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-orange-500/10 text-orange-600 border border-orange-500/20">
+                            <Flame class="w-3.5 h-3.5 fill-current" /> Daily Streak
+                        </span>
+                        <span class="text-xs text-slate-400">
+                            Terakhir mencatat: {{ user.last_activity_date || 'Belum pernah' }}
+                        </span>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mt-4 gap-4">
+                        <div>
+                            <h3 class="text-3xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                                🔥 {{ user.streak_count }} Hari <span class="text-lg font-semibold text-slate-500 dark:text-slate-400">Beruntun</span>
+                            </h3>
+                            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+                                {{ user.streak_count > 0 
+                                    ? 'Kerja bagus! Jaga streak harian kamu dengan mencatat pendapatan atau pengeluaran baru setiap hari.'
+                                    : 'Ayo mulai streak harian pertamamu hari ini! Catat pemasukan atau pengeluaran untuk menyalakan api streak.' 
+                                }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Day circles to show visual streak progress -->
+                <div class="mt-6 border-t border-slate-100 dark:border-slate-800/80 pt-6">
+                    <div class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-3">Api Streak Mingguan</div>
+                    <div class="grid grid-cols-7 gap-2 max-w-md">
+                        <div 
+                            v-for="day in 7" 
+                            :key="day"
+                            class="flex flex-col items-center gap-1.5"
+                        >
+                            <!-- Visual circle indicator: if active streak >= day, show glowing fire circle, otherwise blank circle -->
+                            <div 
+                                class="w-10 h-10 rounded-xl flex items-center justify-center border transition-all duration-300 shadow-sm"
+                                :class="user.streak_count >= day 
+                                    ? 'bg-gradient-to-br from-orange-500 to-rose-500 text-white border-transparent ring-2 ring-orange-500/20' 
+                                    : 'bg-slate-50 border-slate-200 text-slate-400 dark:bg-slate-800 dark:border-slate-700'"
+                            >
+                                <Flame v-if="user.streak_count >= day" class="w-5 h-5 fill-current" />
+                                <span v-else class="text-xs font-semibold">{{ day }}</span>
+                            </div>
+                            <span class="text-[10px] font-medium text-slate-400 dark:text-slate-500">Day {{ day }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Streak Reward Card -->
+            <Card class="bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-slate-900 dark:to-slate-950 border-orange-200/50 dark:border-slate-800 shadow-xl flex flex-col justify-between relative overflow-hidden">
+                <div class="absolute -left-12 -top-12 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <CardHeader class="pb-2">
+                    <CardTitle class="text-lg font-bold text-orange-800 dark:text-orange-400 flex items-center gap-1.5">
+                        <Sparkles class="w-5 h-5 text-orange-500" /> Tantangan Streak
+                    </CardTitle>
+                    <CardDescription class="text-orange-700/80 dark:text-slate-400 text-xs">
+                        Buka Lencana Khusus dengan menjaga streak harianmu!
+                    </CardDescription>
+                </CardHeader>
+                <CardContent class="text-xs text-orange-950/80 dark:text-slate-300 space-y-4 flex-1">
+                    <div class="flex items-start gap-2.5 p-2 rounded-xl bg-white/60 dark:bg-slate-800/40 border border-orange-200/30 dark:border-slate-800">
+                        <div class="p-1.5 bg-orange-500 text-white rounded-lg shadow-md shrink-0">
+                            <Flame class="w-4 h-4 fill-current" />
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-800 dark:text-slate-100">3 Hari Beruntun</div>
+                            <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Dapatkan Lencana <strong>Pejuang Konsisten</strong> & +100 XP bonus!</div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-2.5 p-2 rounded-xl bg-white/60 dark:bg-slate-800/40 border border-orange-200/30 dark:border-slate-800">
+                        <div class="p-1.5 bg-rose-500 text-white rounded-lg shadow-md shrink-0">
+                            <Flame class="w-4 h-4 fill-current" />
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-800 dark:text-slate-100">7 Hari Beruntun</div>
+                            <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Dapatkan Lencana <strong>Master Streak</strong> & +200 XP bonus!</div>
+                        </div>
+                    </div>
+                </CardContent>
+                <CardFooter class="pt-2">
+                    <div class="text-[10px] text-orange-700/70 dark:text-slate-400 flex items-center gap-1.5">
+                        <HelpCircle class="w-3.5 h-3.5" />
+                        <span>Streak dihitung berdasarkan hari beruntun Anda mencatat transaksi.</span>
+                    </div>
+                </CardFooter>
+            </Card>
         </div>
 
         <!-- Badges Grid Section -->

@@ -47,6 +47,10 @@ interface User {
     level: number;
     level_label: string;
     streak_count: number;
+    coins: number;
+    mascot_name: string;
+    owned_accessories: string[];
+    equipped_accessories: string[];
     monthly_income: number;
     budgeting_method: string;
     custom_budget_percentages: {

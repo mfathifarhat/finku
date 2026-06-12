@@ -32,6 +32,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('goals/{goal}', [GoalController::class, 'destroy'])->name('goals.destroy');
 
     Route::get('gamification', [GamificationController::class, 'index'])->name('gamification.index');
+    Route::post('gamification/mascot/buy', [\App\Http\Controllers\MascotShopController::class, 'buy'])->name('gamification.mascot.buy');
+    Route::post('gamification/mascot/equip', [\App\Http\Controllers\MascotShopController::class, 'equip'])->name('gamification.mascot.equip');
+    Route::post('gamification/mascot/rename', [\App\Http\Controllers\MascotShopController::class, 'rename'])->name('gamification.mascot.rename');
 
     Route::get('insights', [InsightController::class, 'index'])->name('insights.index');
 

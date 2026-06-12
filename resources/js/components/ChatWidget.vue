@@ -2,6 +2,7 @@
 import { ref, watch, nextTick, onMounted } from 'vue';
 import { MessageSquare, Send, X, Bot, Sparkles, Loader2 } from '@lucide/vue';
 import { usePage } from '@inertiajs/vue3';
+import MascotFox from '@/components/MascotFox.vue';
 
 interface Message {
     role: 'user' | 'model';
@@ -11,13 +12,34 @@ interface Message {
 const page = usePage();
 const userName = ref('Kak');
 
+const userLevel = ref(1);
+const mascotName = ref('Finku Fox');
+const equippedAccessories = ref<string[]>([]);
+
+const syncMascotDetails = () => {
+    const authUser = (page.props as any).auth?.user || (page.props as any).user;
+    if (authUser) {
+        userLevel.value = authUser.level || 1;
+        mascotName.value = authUser.mascot_name || 'Finku Fox';
+        equippedAccessories.value = authUser.equipped_accessories || [];
+    }
+};
+
 onMounted(() => {
+    syncMascotDetails();
     const authUser = (page.props as any).auth?.user || (page.props as any).user;
     if (authUser?.name) {
         // Grab first name
         userName.value = authUser.name.split(' ')[0];
     }
+
+    // Update welcome message dynamically with the mascot name
+    messages.value[0].text = `Halo! Aku ${mascotName.value}, maskot pendamping dan asisten keuangan pribadi cerdasmu. Ada yang ingin kamu tanyakan mengenai kondisi anggaran, progres target tabungan, atau cara naik level XP finansialmu?`;
 });
+
+watch(() => (page.props as any).auth?.user, () => {
+    syncMascotDetails();
+}, { deep: true });
 
 const isOpen = ref(false);
 const isTyping = ref(false);
@@ -65,7 +87,7 @@ const sendMessage = async (text: string) => {
 
     try {
         const xsrfToken = getCookie('XSRF-TOKEN');
-        
+
         const historyPayload = messages.value.slice(0, -1).map(m => ({
             role: m.role,
             text: m.text
@@ -86,7 +108,7 @@ const sendMessage = async (text: string) => {
         });
 
         const result = await response.json();
-        
+
         if (response.ok && result.success) {
             messages.value.push({
                 role: 'model',
@@ -142,7 +164,7 @@ const formatMessageText = (text: string) => {
 
     // Replace bold formatting: **text** -> <strong>text</strong>
     escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    
+
     // Replace italic formatting: *text* -> <em>text</em>
     escaped = escaped.replace(/\*(.*?)\*/g, '<em>$1</em>');
     escaped = escaped.replace(/_(.*?)_/g, '<em>$1</em>');
@@ -164,42 +186,43 @@ const formatMessageText = (text: string) => {
 
 <template>
     <div class="fixed bottom-20 lg:bottom-6 right-6 z-50 font-sans">
-        <!-- Chat Bubble Button -->
-        <button 
+        <!-- Chat Bubble Button (Mascot) -->
+        <button
             v-if="!isOpen"
             @click="isOpen = true"
-            class="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-xl hover:shadow-emerald-200/50 hover:scale-105 transition-all duration-300 relative group cursor-pointer"
+            class="flex items-center justify-center w-16 h-16 rounded-2xl text-white shadow-2xl hover:scale-110 transition-all duration-300 relative border-2 border-emerald-500 group cursor-pointer"
+            :title="`Buka obrolan dengan ${mascotName}`"
         >
-            <MessageSquare class="w-6 h-6 group-hover:rotate-12 transition-transform" />
-            <span class="absolute -top-1 -right-1 flex h-3 w-3">
+            <MascotFox :level="userLevel" :equipped="equippedAccessories" :size="52" :hideBadge="true" class="mt-1" />
+            <!-- Glowing status indicator -->
+            <span class="absolute -top-0.5 -right-0.5 flex h-3 w-3">
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
             </span>
         </button>
 
         <!-- Chat Panel Window -->
-        <div 
+        <div
             v-else
             class="w-[360px] sm:w-[400px] h-[550px] bg-white border border-slate-100 rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 transform scale-100 origin-bottom-right"
         >
             <!-- Chat Header -->
             <div class="bg-gradient-to-r from-emerald-600 to-teal-500 p-4 text-white flex items-center justify-between shadow-md">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center relative border border-white/20">
-                        <Bot class="w-5 h-5 text-white animate-pulse" />
-                        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 border-2 border-emerald-600 rounded-full"></span>
+                    <div class="w-11 h-11 rounded-full flex items-center justify-center relative overflow-hidden">
+                        <MascotFox :level="userLevel" :equipped="equippedAccessories" :size="38" :hideBadge="true" />
                     </div>
                     <div>
                         <h3 class="font-bold text-sm flex items-center gap-1.5">
-                            Finku-AI <Sparkles class="w-3.5 h-3.5 text-amber-300" />
+                            {{ mascotName }} <Sparkles class="w-3.5 h-3.5 text-amber-300" />
                         </h3>
-                        <p class="text-xs text-emerald-100 flex items-center gap-1">
-                            <span class="w-2 h-2 rounded-full" :class="isOfflineMode ? 'bg-amber-400 animate-pulse' : 'bg-emerald-400'"></span>
-                            {{ isOfflineMode ? 'Mode Offline (Aktif)' : 'Asisten Keuangan Cerdas' }}
+                        <p class="text-[10px] text-emerald-100 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full" :class="isOfflineMode ? 'bg-amber-400 animate-pulse' : 'bg-emerald-400'"></span>
+                            {{ isOfflineMode ? 'Mode Offline' : 'Asisten Keuangan Cerdas' }}
                         </p>
                     </div>
                 </div>
-                <button 
+                <button
                     @click="isOpen = false"
                     class="p-1 rounded-full hover:bg-white/10 transition-colors text-white/80 hover:text-white cursor-pointer"
                 >
@@ -208,21 +231,21 @@ const formatMessageText = (text: string) => {
             </div>
 
             <!-- Chat Messages Box -->
-            <div 
+            <div
                 ref="chatContainer"
                 class="flex-1 p-4 overflow-y-auto bg-slate-50/50 space-y-3 scroll-smooth"
             >
-                <div 
-                    v-for="(msg, idx) in messages" 
+                <div
+                    v-for="(msg, idx) in messages"
                     :key="idx"
                     class="flex flex-col"
                 >
                     <!-- Message Bubble -->
-                    <div 
+                    <div
                         :class="[
                             'max-w-[85%] rounded-2xl p-3 text-sm shadow-sm leading-relaxed',
-                            msg.role === 'user' 
-                                ? 'bg-emerald-600 text-white self-end rounded-br-none' 
+                            msg.role === 'user'
+                                ? 'bg-emerald-600 text-white self-end rounded-br-none'
                                 : 'bg-white text-slate-700 border border-slate-100 self-start rounded-bl-none'
                         ]"
                     >
@@ -239,19 +262,19 @@ const formatMessageText = (text: string) => {
 
             <!-- Quick Suggestions (Chips) -->
             <div class="px-4 py-2 bg-slate-50 border-t border-slate-100 overflow-x-auto flex gap-2 no-scrollbar">
-                <button 
+                <button
                     @click="sendQuickPrompt('Bagaimana kondisi keuanganku bulan ini?')"
                     class="text-xs font-semibold px-3 py-1.5 bg-white border border-slate-200 rounded-full text-slate-600 hover:border-emerald-500 hover:text-emerald-600 transition-colors shrink-0 shadow-sm cursor-pointer"
                 >
                     📊 Cek Keuangan
                 </button>
-                <button 
+                <button
                     @click="sendQuickPrompt('Beri aku tips hemat dan menabung minggu ini')"
                     class="text-xs font-semibold px-3 py-1.5 bg-white border border-slate-200 rounded-full text-slate-600 hover:border-emerald-500 hover:text-emerald-600 transition-colors shrink-0 shadow-sm cursor-pointer"
                 >
                     💡 Tips Hemat
                 </button>
-                <button 
+                <button
                     @click="sendQuickPrompt('Bagaimana cara cepat naik level XP finansial?')"
                     class="text-xs font-semibold px-3 py-1.5 bg-white border border-slate-200 rounded-full text-slate-600 hover:border-emerald-500 hover:text-emerald-600 transition-colors shrink-0 shadow-sm cursor-pointer"
                 >
@@ -264,7 +287,7 @@ const formatMessageText = (text: string) => {
                 <p class="text-xs text-amber-800 leading-normal">
                     ⚠️ <strong>Layanan AI sedang tidak aktif.</strong> Silakan beralih ke Asisten Offline FinKu untuk tetap menanyakan analisis budget, target tabungan, dan gamifikasi.
                 </p>
-                <button 
+                <button
                     @click="switchToOfflineMode"
                     class="w-full py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors cursor-pointer"
                 >
@@ -274,15 +297,15 @@ const formatMessageText = (text: string) => {
 
             <!-- Chat Input Bar -->
             <div class="p-3 bg-white border-t border-slate-100 flex items-center gap-2">
-                <input 
-                    type="text" 
+                <input
+                    type="text"
                     v-model="inputMessage"
                     @keyup.enter="sendMessage(inputMessage)"
-                    placeholder="Tanyakan keuanganmu ke Finku-AI..." 
+                    placeholder="Tanyakan keuanganmu ke Finku-AI..."
                     class="flex-1 bg-slate-50 text-slate-700 text-sm px-4 py-2.5 rounded-xl border border-slate-200/80 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all"
                     :disabled="isTyping"
                 />
-                <button 
+                <button
                     @click="sendMessage(inputMessage)"
                     class="p-2.5 rounded-xl bg-emerald-600 text-white hover:bg-emerald-500 transition-colors disabled:opacity-50 cursor-pointer shadow"
                     :disabled="!inputMessage.trim() || isTyping"

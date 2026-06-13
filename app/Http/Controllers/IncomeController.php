@@ -28,6 +28,7 @@ class IncomeController extends Controller
 
         // Award 10 XP for logging income
         $xpResult = $user->addXp(10);
+        $user->addCoins(5);
         $leveledUp = $xpResult['leveled_up'];
         $currentLevel = $xpResult['current_level'];
 
@@ -52,7 +53,7 @@ class IncomeController extends Controller
             ])->toArray());
         }
 
-        $msg = 'Pemasukan berhasil dicatat! +10 XP';
+        $msg = 'Pemasukan berhasil dicatat! +10 XP & +5 Finku Coins';
         if ($streakResult['updated']) {
             $msg .= " Streak Harian: {$streakResult['streak_count']} hari (+{$streakResult['bonus_xp']} XP!)";
         }

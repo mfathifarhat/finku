@@ -65,6 +65,7 @@ class ExpenseController extends Controller
 
         // Award 10 XP for logging an expense
         $xpResult = $user->addXp(10);
+        $user->addCoins(5);
         $leveledUp = $xpResult['leveled_up'];
         $currentLevel = $xpResult['current_level'];
 
@@ -112,7 +113,7 @@ class ExpenseController extends Controller
             ? ($user->monthly_income * $needsPercent) / 100
             : ($user->monthly_income * $wantsPercent) / 100;
 
-        $msg = 'Pengeluaran berhasil dicatat! +10 XP';
+        $msg = 'Pengeluaran berhasil dicatat! +10 XP & +5 Finku Coins';
         if ($streakResult['updated']) {
             $msg .= " Streak Harian: {$streakResult['streak_count']} hari (+{$streakResult['bonus_xp']} XP!)";
         }

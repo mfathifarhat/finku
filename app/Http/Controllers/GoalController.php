@@ -43,6 +43,7 @@ class GoalController extends Controller
 
         // Award 20 XP for setting a goal
         $xpResult = $user->addXp(20);
+        $user->addCoins(15);
         if ($xpResult['leveled_up']) {
             session()->flash('level_up', $xpResult['current_level']);
         }
@@ -57,7 +58,7 @@ class GoalController extends Controller
             ])->toArray());
         }
 
-        $msg = 'Target tabungan berhasil dibuat! +20 XP';
+        $msg = 'Target tabungan berhasil dibuat! +20 XP & +15 Finku Coins';
         if (count($newBadges) > 0) {
             $badgeNames = collect($newBadges)->pluck('name')->join(', ');
             $msg .= " Lencana Baru Dibuka: {$badgeNames}!";
@@ -88,6 +89,7 @@ class GoalController extends Controller
 
         // Award 15 XP for saving money
         $xpResult = $user->addXp(15);
+        $user->addCoins(10);
         if ($xpResult['leveled_up']) {
             session()->flash('level_up', $xpResult['current_level']);
         }
@@ -102,7 +104,7 @@ class GoalController extends Controller
             ])->toArray());
         }
 
-        $msg = 'Tabungan berhasil ditambahkan! +15 XP';
+        $msg = 'Tabungan berhasil ditambahkan! +15 XP & +10 Finku Coins';
         if ($completed) {
             $msg .= " Selamat! Target '{$goal->name}' Anda telah tercapai! 🎉";
         }

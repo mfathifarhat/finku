@@ -15,7 +15,7 @@ use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
-#[Fillable(['name', 'email', 'password', 'xp', 'level', 'streak_count', 'last_activity_date', 'monthly_income', 'budgeting_method', 'custom_budget_percentages'])]
+#[Fillable(['name', 'email', 'password', 'xp', 'level', 'streak_count', 'last_activity_date', 'coins', 'mascot_name', 'owned_accessories', 'equipped_accessories', 'monthly_income', 'budgeting_method', 'custom_budget_percentages'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements PasskeyUser
 {
@@ -76,7 +76,71 @@ class User extends Authenticatable implements PasskeyUser
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
             'custom_budget_percentages' => 'array',
+            'owned_accessories' => 'array',
+            'equipped_accessories' => 'array',
         ];
+    }
+
+    public function addCoins(int $amount): void
+    {
+        $this->coins += $amount;
+        $this->save();
+    }
+
+    public function deductCoins(int $amount): bool
+    {
+        if ($this->coins >= $amount) {
+            $this->coins -= $amount;
+            $this->save();
+            return true;
+        }
+        return false;
+    }
+
+    public function buyAccessory(string $code, int $price): bool
+    {
+        $owned = $this->owned_accessories ?? [];
+        if (in_array($code, $owned)) {
+            return false;
+        }
+
+        if ($this->deductCoins($price)) {
+            $owned[] = $code;
+            $this->owned_accessories = $owned;
+            $this->save();
+            return true;
+        }
+
+        return false;
+    }
+
+    public function equipAccessory(string $code, string $slot): bool
+    {
+        $owned = $this->owned_accessories ?? [];
+        if (!in_array($code, $owned)) {
+            return false;
+        }
+
+        $equipped = $this->equipped_accessories ?? [];
+
+        // Remove any currently equipped items in the same category slot (e.g. hat, glasses, neck, back)
+        // This is done by looking up prefix or passed slot type
+        $equipped = array_filter($equipped, function($item) use ($slot) {
+            return !str_starts_with($item, $slot . '_');
+        });
+
+        $equipped[] = $code;
+        $this->equipped_accessories = array_values($equipped);
+        $this->save();
+        return true;
+    }
+
+    public function unequipAccessory(string $code): void
+    {
+        $equipped = $this->equipped_accessories ?? [];
+        $equipped = array_filter($equipped, fn($item) => $item !== $code);
+        $this->equipped_accessories = array_values($equipped);
+        $this->save();
     }
 
     public function addXp(int $amount): array

@@ -190,7 +190,7 @@ const formatMessageText = (text: string) => {
         <button
             v-if="!isOpen"
             @click="isOpen = true"
-            class="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-xl hover:shadow-emerald-200/50 hover:scale-105 transition-all duration-300 relative group cursor-pointer"
+            class="flex items-center justify-center w-16 h-16 rounded-full text-white shadow-xl hover:shadow-emerald-200/50 hover:scale-105 transition-all duration-300 relative group cursor-pointer"
         >
             <MascotFox :level="userLevel" :equipped="equippedAccessories" :size="52" :hideBadge="true" class="mt-1" />
             <!-- Glowing status indicator -->
